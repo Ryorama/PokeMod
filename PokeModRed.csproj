@@ -107,10 +107,13 @@
     <Compile Include="IPokedexEntry.cs" />
     <Compile Include="Items\Armor\RedCap.cs" />
     <Compile Include="Items\Pokecase.cs" />
+    <Compile Include="Items\PokeGlobalItem.cs" />
+    <Compile Include="Items\PokeGlobalRecipe.cs" />
     <Compile Include="Items\Weapons\ArbokPokeball.cs" />
     <Compile Include="Items\Weapons\BeedrillPokeball.cs" />
     <Compile Include="Items\Weapons\BlastoisePokeball.cs" />
     <Compile Include="Items\Weapons\BulbasaurPokeball.cs" />
+    <Compile Include="Items\Weapons\BulbasaurPokeballRecipe.cs" />
     <Compile Include="Items\Weapons\ButterfreePokeball.cs" />
     <Compile Include="Items\Weapons\CaterpiePokeball.cs" />
     <Compile Include="Items\Weapons\CharizardPokeball.cs" />

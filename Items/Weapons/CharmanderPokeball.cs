@@ -18,9 +18,10 @@ namespace PokeModRed.Items.Weapons {
         public override void AddRecipes()
         {
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(null, "Pokecase");
-            recipe.SetResult(this);
+            recipe.AddIngredient(null, "Pokecase", 1);
+            recipe.SetResult(ItemLoader.GetItem(item.type));
             recipe.AddRecipe();
         }
     }
 }
+ 

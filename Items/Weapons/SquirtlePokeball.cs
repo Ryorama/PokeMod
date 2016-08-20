@@ -12,14 +12,14 @@ namespace PokeModRed.Items.Weapons {
 		
 		public override void SetDefaults()
 		{
-			base.SetDefaults();
+            base.SetDefaults();
 		}
 
         public override void AddRecipes()
         {
             ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(null, "Pokecase");
-            recipe.SetResult(this);
+            recipe.AddIngredient(null, "Pokecase", 1);
+            recipe.SetResult(mod.ItemType(Name + "Pokeball"));
             recipe.AddRecipe();
         }
     }

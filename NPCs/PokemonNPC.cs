@@ -40,20 +40,22 @@ namespace PokeModRed.NPCs
 		public PokemonWeapon pokemon; //does this need to be synced?
 		private bool set = false;
         public float movSpeed;
+        int combatTextNum;
         //private bool netUpdate = true;
 
         //internals that are the same for all Pokemon of certain species or can be derived from synchronized properties
+        public static Color PokemonText = new Color(255, 255, 255, 255);
         public virtual float id {get; protected set;}
 		public virtual float idleAccel {get{return 0.978f;}}
 		public virtual float spacingMult {get{return 1f;}}
 		public virtual float viewDist {get{return 400f;}}
-		public virtual float chaseDist {get{return 25f;}}
+		public virtual float chaseDist {get{return 75f;}}
 		public virtual float chaseAccel {get{return 6f;}}
 		public virtual float inertia {get{return 40f;}}
 		public virtual float shootCool {get{return 270f;}}
 		public virtual float shootSpeed { get { return 12f; } }
         public virtual int shoot {get{return -1;}}
-        public virtual float speed { get { return (float)Spe*2 / (float)level; } }
+        public virtual float speed { get { return (float)Spe / (float)level / 10f; } }
         public virtual byte aiMode { get { return running; } }
 
         public int maxHP
@@ -134,6 +136,7 @@ namespace PokeModRed.NPCs
 		public const byte running = 1;
         public const byte flying = 2;
         public const byte swimming = 3;
+        public static float spacing = 10.0f;
 
         public int catchRate {
 			get{
@@ -301,7 +304,7 @@ namespace PokeModRed.NPCs
 			if (NPC.downedGolemBoss){spawnLevel+=spawnFactor;}
 			if (NPC.downedAncientCultist){spawnLevel+=spawnFactor;}			
 			level = (byte)rnd.Next(spawnLevel,spawnLevel+4);
-			//npc.displayName = npc.name;
+			npc.displayName = npc.name;
 			npc.displayName = "Lvl " +level.ToString() +" " +npc.name; //WORKS BUT MAKES DEBUGGING WITH /npc DIFFICULT AS YOU NEED TO TYPE /npc Lvl # Caterpie TO GET A CATERPIE
 			npc.friendly = true;
             npc.damage = Atk;
@@ -314,6 +317,7 @@ namespace PokeModRed.NPCs
 			npc.soundKilled = mod.GetSoundSlot(SoundType.NPCKilled, "Sounds/NPCKilled/id"+((int)id).ToString());
 		}
 		
+        /*
 		public override void SendExtraAI(BinaryWriter writer)
 		{
 
@@ -323,14 +327,18 @@ namespace PokeModRed.NPCs
 		{
 
 		}
-		
+		*/
+
 		public override void AI()
 		{
             if (!set && npc.releaseOwner != 255)
             {
-                if (Main.myPlayer == npc.releaseOwner)
+                //Main.NewText("Go " + npc.name + "!");
+                combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[npc.releaseOwner].position.X, (int)Main.player[npc.releaseOwner].position.Y, npc.width, npc.height), PokemonText, "Go " + npc.name + "!", false, false);
+                if (Main.netMode == 2 && combatTextNum != 100)
                 {
-                    Main.NewText("Go " + npc.name + "!");
+                    CombatText combatText = Main.combatText[combatTextNum];
+                    NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
                 }
                 pokemon = Main.player[npc.releaseOwner].inventory[Main.player[npc.releaseOwner].selectedItem].modItem as PokemonWeapon;
                 level = pokemon.level;
@@ -352,6 +360,7 @@ namespace PokeModRed.NPCs
                 npc.lifeMax = maxHP;
                 npc.life = maxHP;
                 Main.player[npc.releaseOwner].AddBuff(mod.BuffType(Name+"Buff"), 3600);
+                npc.displayName = "Lvl " + level.ToString() + " " + npc.name;
                 set = true;
             }
 			if (!set && npc.releaseOwner == 255)
@@ -364,83 +373,70 @@ namespace PokeModRed.NPCs
             {
                 if (aiMode == swimming)
                 {
-                    movSpeed = speed * 2;
+                    movSpeed = speed;
+                } else
+                {
+                    movSpeed = speed / 2f;
                 }
-                movSpeed = speed / 4;
             }
             else
             {
 				if (aiMode == swimming)
                 {
-                    movSpeed = speed / 4;
-                }
-                movSpeed = speed;
-            }
-            
-            int pDirection;
-			Vector2 pCenter;
-			// look at each other active npc and if it is owned by this player then maintain a bit of spacing instead of all clumping up
-			if (npc.releaseOwner!=255)
-			{
-				pCenter = Main.player[npc.releaseOwner].Center;
-                if (aiMode == flying)
+                    movSpeed = speed / 2f;
+                } else
                 {
-                    pCenter.Y = pCenter.Y - 60f;
+                    movSpeed = speed;
                 }
-				pDirection = Main.player[npc.releaseOwner].direction;
-				npc.friendly = true;
-			} else {
-                pCenter = new Vector2(0, 0);
-                pDirection = 1;
-                npc.friendly = false;
             }
+
+            // check on currently on the ground
+            bool grounded = false;
+
+            if (npc.velocity.Y == 0.0f)
+            {
+                int num103 = (int)(npc.position.X + (float)(npc.width / 2)) / 16;
+                int num104 = (int)(npc.position.Y + (float)npc.height) / 16 + 1;
+                if (WorldGen.SolidTile(num103, num104))
+                {
+                    grounded = true;
+                }
+            }
+
+            float distance = 9999999;
             Vector2 targetPos = npc.position;
-            float targetDist = viewDist;
-            bool target = false;
-            npc.noTileCollide = false;
-            float spacing = (float)npc.width * spacingMult;
+            Vector2 direction;
+
+            //find target
             if (npc.friendly)
-			{
-                    
-				for (int k = 0; k < 200; k++)
-				{
-                    NPC otherNPC = Main.npc[k];
-                    if (k != npc.whoAmI && otherNPC.active && otherNPC.releaseOwner == npc.releaseOwner && System.Math.Abs(npc.position.X - otherNPC.position.X) + System.Math.Abs(npc.position.Y - otherNPC.position.Y) < spacing)
+            {
+                // if the distance from the player is too great, just instant teleport to the player
+                if ((Main.player[npc.releaseOwner].Center - npc.Center).Length() > 1000f)
+                {
+                    npc.Center = Main.player[npc.releaseOwner].Center;
+                    if (aiMode == flying || (aiMode == swimming && npc.wet))
                     {
-                        if (npc.position.X < otherNPC.position.X)
-                        {
-                            npc.velocity.X -= idleAccel;
-                        }
-                        else
-                        {
-                            npc.velocity.X += idleAccel;
-                        }
-                        if (npc.position.Y < otherNPC.position.Y)
-                        {
-                            if (aiMode == flying)
-                            {
-                                npc.velocity.Y -= idleAccel;
-                            }
-                        }
-                        else
-                        {
-                            npc.velocity.Y += idleAccel;
-                        }
-					}
-                    if (otherNPC.CanBeChasedBy(this, false))
-                    {
-                        float distance = Vector2.Distance(otherNPC.Center, npc.Center);
-                        if ((distance < targetDist || !target) && Collision.CanHitLine(npc.position, npc.width, npc.height, otherNPC.position, otherNPC.width, otherNPC.height))
-                        {
-                            targetDist = distance;
-                            targetPos = otherNPC.Center;
-                            target = true;
-                        }
+                        npc.position.Y -= npc.height;
                     }
                 }
-			} else {
-                // enemy npc ai for targeting
 
+                // look for a non friendly npc within sight range and set them as the target
+                for (int k = 0; k < 200; k++)
+                {
+                    NPC otherNPC = Main.npc[k];
+                    direction = otherNPC.Center - npc.Center;
+                    float otherDistance = direction.Length();
+                    if (otherNPC.CanBeChasedBy(this, false) && otherDistance < distance && otherDistance < viewDist && Collision.CanHitLine(otherNPC.position, otherNPC.width, otherNPC.height, npc.position, npc.width, npc.height))
+                    {
+                        distance = otherDistance;
+                        targetPos = otherNPC.position;
+                        FaceTarget(otherNPC);
+                    }
+                }
+            }
+            else //not friendly
+            {
+                // look for a player or friendly npc within sight range and set them as the target
                 // don't have a target? then get one
                 if (npc.target < 0 || npc.target == 255 || Main.player[npc.target].dead || !Main.player[npc.target].active)
                 {
@@ -451,252 +447,212 @@ namespace PokeModRed.NPCs
                 {
                     targetPos = Main.player[npc.target].position;
                     targetPos.Y = targetPos.Y + (Main.player[npc.target].height / 2);
-                    target = true;
-                    pCenter = Main.player[npc.target].Center;
-                    pDirection = Main.player[npc.target].direction;
                 }
             }
 
-            Vector2 myDirection;
-            float distanceTo;
-            //if you have a target and you are at ai[0] state 0f, aka ready and not currently fleeing back to npc.releaseOwner
-            if (target && npc.ai[0] == 0f)
-			{
-				// get the distance between this and it's target
-				myDirection = targetPos - npc.Center;
-				// if the distance is greater than 'chaseDist', the distance this engages enemies from
-				if (myDirection.Length() > chaseDist)
-				{
-					// then move toward the target
-					myDirection.Normalize();
-					npc.velocity = (npc.velocity * inertia + myDirection * chaseAccel) / (inertia + 1);
-				}
-				else
-				{
-					//otherwise slowly come to a halt
-					npc.velocity *= (float)Math.Pow(0.97, 40.0 / inertia);
-				}
-            }
-			else
-			{
-                if (npc.friendly)
-                {
-                    int num = 1;
-                    myDirection = pCenter - npc.Center;
-                    distanceTo = myDirection.Length();
-                    // if the distance is too great, just instant teleport to the player
-                    if (distanceTo > 1000f)
-                    {
-                        npc.Center = pCenter;
-                    }
-                    npc.ai[1] = 3600f;
-                    npc.netUpdate = true;
-                    if (distanceTo > 48f)
-					{
-						myDirection.Normalize();
-						myDirection *= movSpeed;
-						float temp = inertia / 2f;
-						npc.velocity = (npc.velocity * temp + myDirection) / (temp + 1);
-					}
-					else
-					{
-						npc.direction = pDirection;
-						npc.velocity *= (float)Math.Pow(0.9, 40.0 / inertia);
-                        if (aiMode == flying) //************************* FLYING *************************
-                        {
-                            if (npc.velocity.X == 0f && npc.velocity.Y == 0f)
-                            {
-                                npc.velocity.X = -0.15f;
-                                npc.velocity.Y = -0.05f;
-                            }
-                            npc.velocity *= 1.01f;
-                        }
-					}
-                }
-            }
-            
-
-            npc.rotation = npc.velocity.X * 0.05f;
-			if (npc.velocity.X > 0f)
-			{
-				npc.spriteDirection = (npc.direction = 1);
-			}
-			else if (npc.velocity.X < 0f)
-			{
-				npc.spriteDirection = (npc.direction = -1);
-			}
-			if (npc.ai[1] > 0f)
-			{
-				npc.ai[1] += 1f;
-				if (Main.rand.Next(3) == 0)
-				{
-					npc.ai[1] += 1f;
-				}
-			}
-			if (npc.ai[1] > shootCool)
-			{
-				npc.ai[1] = 0f;
-				npc.netUpdate = true;
-			}
-			if (npc.ai[0] == 0f)
-			{
-				if (target)
-				{
-					if ((targetPos - npc.Center).X > 0f)
-					{
-						npc.spriteDirection = (npc.direction = 1);
-					}
-					else if ((targetPos - npc.Center).X < 0f)
-					{
-						npc.spriteDirection = (npc.direction = -1);
-					}
-					if (npc.ai[1] == 0f)
-					{
-						npc.ai[1] = 1f;
-                        if (Main.netMode != 1)
-                        {
-                            // shoot code
-                            if (shoot != -1)
-							{
-								Vector2 shootVel = targetPos - npc.Center;
-								if (shootVel == Vector2.Zero)
-								{
-									shootVel = new Vector2(0f, 1f);
-								}
-								shootVel.Normalize();
-								shootVel *= shootSpeed;
-                                int owner;
-                                if (npc.friendly)
-                                {
-                                    owner = Main.player[npc.releaseOwner].whoAmI;
-                                } else
-                                {
-                                    owner = 255;
-                                }
-								int proj = Projectile.NewProjectile(npc.Center.X, npc.position.Y, shootVel.X, shootVel.Y, shoot, GetRangedDamage(), GetKnockback(), owner, 0f, 0f);
-								PokemonProjectile pokemonProjectile;
-								pokemonProjectile = Main.projectile[proj].modProjectile as PokemonProjectile;
-								pokemonProjectile.pokemon = this.pokemon;
-								Main.projectile[proj].timeLeft = 300;
-								Main.projectile[proj].netUpdate = true;
-                                if (owner == 255)
-                                {
-                                    Main.projectile[proj].friendly = false;
-                                    Main.projectile[proj].hostile = true;
-                                }
-                                else {
-                                    Main.projectile[proj].friendly = true;
-                                    Main.projectile[proj].hostile = false;
-                                }
-                                npc.netUpdate = true;
-							}
-						}
-					}
-				}
-			}
-            // JUMP GAPS
-            if (aiMode == running)
+            //attack target
+            if (targetPos != npc.position) // if there is a target
             {
-                int xPos = (int)((npc.position.X + (float)(npc.width / 2) + (float)((npc.width / 2 + 16) * npc.direction)) / 16f);
-                int yPos = (int)((npc.position.Y + (float)npc.height - 15f) / 16f);
-                if (Main.tile[xPos, yPos] == null)
+                // get the distance between this and it's target
+                direction = targetPos - npc.Center;
+                // if the distance is greater than 'chaseDist', the distance this engages enemies from
+                if (direction.Length() > 10.0f)
                 {
-                    Main.tile[xPos, yPos] = new Tile();
-                }
-                if (Main.tile[xPos, yPos - 1] == null)
-                {
-                    Main.tile[xPos, yPos - 1] = new Tile();
-                }
-                if (Main.tile[xPos, yPos - 2] == null)
-                {
-                    Main.tile[xPos, yPos - 2] = new Tile();
-                }
-                if (Main.tile[xPos, yPos - 3] == null)
-                {
-                    Main.tile[xPos, yPos - 3] = new Tile();
-                }
-                if (Main.tile[xPos, yPos + 1] == null)
-                {
-                    Main.tile[xPos, yPos + 1] = new Tile();
-                }
-                if (Main.tile[xPos + npc.direction, yPos - 1] == null)
-                {
-                    Main.tile[xPos + npc.direction, yPos - 1] = new Tile();
-                }
-                if (Main.tile[xPos + npc.direction, yPos + 1] == null)
-                {
-                    Main.tile[xPos + npc.direction, yPos + 1] = new Tile();
-                }
-                if (Main.tile[xPos - npc.direction, yPos + 1] == null)
-                {
-                    Main.tile[xPos - npc.direction, yPos + 1] = new Tile();
-                }
-                if ((npc.velocity.X < 0f && npc.spriteDirection == -1) || (npc.velocity.X > 0f && npc.spriteDirection == 1))
-                {
-                    if (Main.tile[xPos, yPos - 2].nactive() && Main.tileSolid[(int)Main.tile[xPos, yPos - 2].type])
+                    // then move toward the target
+                    //direction.Normalize();
+                    //npc.velocity = (npc.velocity * inertia + direction * chaseAccel) / (inertia + 1);
+                    if (npc.direction > 0)
                     {
-                        if (Main.tile[xPos, yPos - 3].nactive() && Main.tileSolid[(int)Main.tile[xPos, yPos - 3].type])
+                        npc.velocity.X += movSpeed;
+                    }
+                    if (npc.direction < 0)
+                    {
+                        npc.velocity.X -= movSpeed;
+                    }
+
+                    if (aiMode == flying || (aiMode == swimming && npc.wet))
+                    {
+                        if (npc.directionY > 0)
                         {
-                            npc.velocity.Y = -8f;
-                            npc.netUpdate = true;
+                            npc.velocity.Y += movSpeed;
                         }
-                        else
+                        if (npc.directionY < 0)
                         {
-                            npc.velocity.Y = -7f;
-                            npc.netUpdate = true;
+                            npc.velocity.Y -= movSpeed;
                         }
                     }
-                    /*
-                    if (Main.tile[xPos, yPos - 2].nactive() && Main.tileSolid[(int)Main.tile[xPos, yPos - 2].type])
+
+                    // jump at targets you can't reach 
+                    if (targetPos.Y < npc.position.Y && grounded)
                     {
-                        if (Main.tile[xPos, yPos - 3].nactive() && Main.tileSolid[(int)Main.tile[xPos, yPos - 3].type])
-                        {
-                            npc.velocity.Y = -8f;
-                            npc.netUpdate = true;
-                        }
-                        else
-                        {
-                            npc.velocity.Y = -7f;
-                            npc.netUpdate = true;
-                        }
+                        npc.velocity.Y -= movSpeed;
                     }
-                    */
-                    /*
-                    else if (Main.tile[xPos, yPos - 1].nactive() && Main.tileSolid[(int)Main.tile[xPos, yPos - 1].type])
-                    {
-                        npc.velocity.Y = -6f;
-                        npc.netUpdate = true;
-                    }
-                    else if (npc.position.Y + (float)npc.height - (float)(yPos * 16) > 20f && Main.tile[xPos, yPos].nactive() && !Main.tile[xPos, yPos].topSlope() && Main.tileSolid[(int)Main.tile[xPos, yPos].type])
-                    {
-                        npc.velocity.Y = -5f;
-                        npc.netUpdate = true;
-                    }
-                    else if (npc.directionY < 0 && npc.type != 67 && (!Main.tile[xPos, yPos + 1].nactive() || !Main.tileSolid[(int)Main.tile[xPos, yPos + 1].type]) && (!Main.tile[xPos + npc.direction, yPos + 1].nactive() || !Main.tileSolid[(int)Main.tile[xPos + npc.direction, yPos + 1].type]))
-                    {
-                        npc.velocity.Y = -8f;
-                        npc.velocity.X = npc.velocity.X * 1.5f;
-                        npc.netUpdate = true;
-                    }
-                    */
+                }
+                else
+                {
+                    //otherwise slowly come to a halt
+                    npc.velocity *= (float)Math.Pow(0.97, 40.0 / inertia);
                 }
                 /*
-                if (npc.velocity.Y == 0f && Math.Abs(npc.position.X + (float)(npc.width / 2) - (Main.player[npc.target].position.X + (float)(Main.player[npc.target].width / 2))) < 100f && Math.Abs(npc.position.Y + (float)(npc.height / 2) - (Main.player[npc.target].position.Y + (float)(Main.player[npc.target].height / 2))) < 50f && ((npc.direction > 0 && npc.velocity.X >= 1f) || (npc.direction < 0 && npc.velocity.X <= -1f)))
-                {
-                    npc.velocity.X = npc.velocity.X * 2f;
-                    if (npc.velocity.X > 3f)
-                    {
-                        npc.velocity.X = 3f;
-                    }
-                    if (npc.velocity.X < -3f)
-                    {
-                        npc.velocity.X = -3f;
-                    }
-                    npc.velocity.Y = -4f;
-                    npc.netUpdate = true;
-                }
+                if in melee range
+                    use melee attack
+                else
+                    if spA > atK then
+                        use a ranged attack
+                        if less than medium distance from owner //means the ranged pokemon will attempt to run away from target while shooting at them, without getting to far to engage, and without just running off on owner
+                            maintain ranged attack distance to target
+                        endif
+                    else
+                        move towards target
+                    endif
+                endif      
                 */
+            } else
+            {
+                //idle movement, this is only when there is no valid target to attack
+                if (npc.friendly)
+                {
+                    direction = Main.player[npc.releaseOwner].Center - npc.Center;
+                    Vector2 targPos = Main.player[npc.releaseOwner].Center;
+                    if (aiMode == flying || (aiMode == swimming && npc.wet))
+                    {
+                        targPos.Y -= npc.height*2;
+                    }
+                    FaceTarget(targPos, Main.player[npc.releaseOwner].width, Main.player[npc.releaseOwner].height);
+                    distance = direction.Length();
+
+                    if (distance > chaseDist) //TODO here is the issue with flying, once it is within chase distance of player it stops hovering and falls due to gravity
+                    {
+                        // then walk, swim, dig, fly to player, if there is no line of sight to player, it is permissible to turn off collision
+                        // TEMPORARY NO MOVEMENT MODES, BASIC LEFT RIGHT WALKING, NO COLLISION TURNING OFF
+                        //direction.Normalize();
+                        //npc.velocity = (npc.velocity * inertia + direction * chaseAccel) / (inertia + 1);
+                        if (npc.direction > 0)
+                        {
+                            npc.velocity.X += movSpeed;
+                        }
+                        if (npc.direction < 0)
+                        {
+                            npc.velocity.X -= movSpeed;
+                        }
+                        // flying should keep moving and maintain height regardless of distance
+                        if (aiMode == flying || (aiMode == swimming && npc.wet))
+                        {
+                            if (npc.directionY > 0)
+                            {
+                                npc.velocity.Y += movSpeed;
+                            } //TODO could make this a else if so it can't move up and down in the one cycle thereby hovering, better for rubber banding
+                            if (npc.directionY < 0)
+                            {
+                                npc.velocity.Y -= movSpeed;
+                            }
+                        }
+                    } else
+                    {
+                        // flying should keep moving and maintain height regardless of distance
+                        if (aiMode == flying || (aiMode == swimming && npc.wet))
+                        {
+                            if (npc.directionY > 0)
+                            {
+                                npc.velocity.Y += movSpeed;
+                            } //TODO could make this a else if so it can't move up and down in the one cycle thereby hovering, better for rubber banding
+                            if (npc.directionY < 0)
+                            {
+                                npc.velocity.Y -= movSpeed;
+                            }
+                        }
+                    }
+
+                }
+                else // not friendly
+                {
+                    // walk, swim, dig, fly around
+                    // NOT USED YET AS ALL NPCS CAN SEE ANYONE IF THEY EXIST, NOT JUST IN A CERTAIN RANGE
+                }
             }
+
+            // climb up stairs code
+            bool flag = false;
+            bool flag2 = false;
+            Collision.StepUp(ref npc.position, ref npc.velocity, npc.width, npc.height, ref npc.stepSpeed, ref npc.gfxOffY, 1, false, 0);
+            if (npc.velocity.Y == 0f)
+            {
+                if (npc.velocity.X < 0f || npc.velocity.X > 0f)
+                {
+                    int num102 = (int)(npc.position.X + (float)(npc.width / 2)) / 16;
+                    int j3 = (int)(npc.position.Y + (float)(npc.height / 2)) / 16 + 1;
+                    if (flag)
+                    {
+                        num102--;
+                    }
+                    if (flag2)
+                    {
+                        num102++;
+                    }
+                    WorldGen.SolidTile(num102, j3);
+                }
+                int num103 = (int)(npc.position.X + (float)(npc.width / 2)) / 16;
+                int num104 = (int)(npc.position.Y + (float)npc.height) / 16 + 1;
+                if (WorldGen.SolidTile(num103, num104) || Main.tile[num103, num104].halfBrick() || Main.tile[num103, num104].slope() > 0 || npc.type == 200)
+                {
+                    if (npc.type == 200)
+                    {
+                        npc.velocity.Y = -3.1f;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            num103 = (int)(npc.position.X + (float)(npc.width / 2)) / 16;
+                            num104 = (int)(npc.position.Y + (float)(npc.height / 2)) / 16;
+                            if (flag)
+                            {
+                                num103--;
+                            }
+                            if (flag2)
+                            {
+                                num103++;
+                            }
+                            num103 += (int)npc.velocity.X;
+                            if (!WorldGen.SolidTile(num103, num104 - 1) && !WorldGen.SolidTile(num103, num104 - 2))
+                            {
+                                npc.velocity.Y = -5.1f;
+                            }
+                            else if (!WorldGen.SolidTile(num103, num104 - 2))
+                            {
+                                npc.velocity.Y = -7.1f;
+                            }
+                            else if (WorldGen.SolidTile(num103, num104 - 5))
+                            {
+                                npc.velocity.Y = -11.1f;
+                            }
+                            else if (WorldGen.SolidTile(num103, num104 - 4))
+                            {
+                                npc.velocity.Y = -10.1f;
+                            }
+                            else
+                            {
+                                npc.velocity.Y = -9.1f;
+                            }
+                        }
+                        catch
+                        {
+                            npc.velocity.Y = -9.1f;
+                        }
+                    }
+                }
+            }
+
+            npc.rotation = npc.velocity.X * 0.05f;
+            if (npc.velocity.X > 0f)
+            {
+                npc.spriteDirection = (npc.direction = 1);
+            }
+            else if (npc.velocity.X < 0f)
+            {
+                npc.spriteDirection = (npc.direction = -1);
+            }
+
             if (capture > 0)
             {
                 Capture();
@@ -718,28 +674,58 @@ namespace PokeModRed.NPCs
                 {
                     if (i==0)
                     {
-                        Main.NewText("Oh no! The Pokémon broke free!");
+                        //Main.NewText("Oh no! The Pokémon broke free!");
+                        combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height), PokemonText, "Oh no! The Pokémon broke free!", false, false);
+                        if (Main.netMode == 2 && combatTextNum != 100)
+                        {
+                            CombatText combatText = Main.combatText[combatTextNum];
+                            NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                        }
                         capture = 0;
                         return;
                     } else if (i==1)
                     {
-                        Main.NewText("Aww! It appeared to be caught!");
+                        //Main.NewText("Aww! It appeared to be caught!");
+                        combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height), PokemonText, "Aww! It appeared to be caught!", false, false);
+                        if (Main.netMode == 2 && combatTextNum != 100)
+                        {
+                            CombatText combatText = Main.combatText[combatTextNum];
+                            NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                        }
                         capture = 0;
                         return;
                     } else if (i==2)
                     {
-                        Main.NewText("Aargh! Almost had it!");
+                        //Main.NewText("Aargh! Almost had it!");
+                        combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height), PokemonText, "Aargh! Almost had it!", false, false);
+                        if (Main.netMode == 2 && combatTextNum != 100)
+                        {
+                            CombatText combatText = Main.combatText[combatTextNum];
+                            NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                        }
                         capture = 0;
                         return;
                     } else if (i == 3)
                     {
-                        Main.NewText("Gah! It was so close, too!");
+                        //Main.NewText("Gah! It was so close, too!");
+                        combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height), PokemonText, "Gah! It was so close, too!", false, false);
+                        if (Main.netMode == 2 && combatTextNum != 100)
+                        {
+                            CombatText combatText = Main.combatText[combatTextNum];
+                            NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                        }
                         capture = 0;
                         return;
                     }
                 }
             }
-            Main.NewText("Gotcha! " +npc.name +" was caught!");
+            //Main.NewText("Gotcha! " +npc.name +" was caught!");
+            combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height), PokemonText, "Gotcha! " + npc.name + " was caught!", false, false);
+            if (Main.netMode == 2 && combatTextNum != 100)
+            {
+                CombatText combatText = Main.combatText[combatTextNum];
+                NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+            }
             int itemRef = Item.NewItem((int)npc.position.X, (int)npc.position.Y, 1, 1, mod.ItemType(Name+"Pokeball"), 1, false, 0, false, false);
             PokemonWeapon newItem;
             newItem = Main.item[itemRef].modItem as PokemonWeapon;
@@ -767,11 +753,14 @@ namespace PokeModRed.NPCs
 		{
 			if (set && npc.releaseOwner != 255 && Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name+"Buff")) > -1)
 			{
-				if (Main.myPlayer == npc.releaseOwner)
-				{
-					Main.NewText(npc.name +" has fainted!");
-				}
-				Main.player[npc.releaseOwner].DelBuff(Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name+"Buff")));
+				//Main.NewText(npc.name +" has fainted!");
+                combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[npc.releaseOwner].position.X, (int)Main.player[npc.releaseOwner].position.Y, npc.width, npc.height), PokemonText, npc.name + " has fainted!", false, false);
+                if (Main.netMode == 2 && combatTextNum != 100)
+                {
+                    CombatText combatText = Main.combatText[combatTextNum];
+                    NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                }
+                Main.player[npc.releaseOwner].DelBuff(Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name+"Buff")));
 			}
 			return true;
 		}
@@ -780,10 +769,13 @@ namespace PokeModRed.NPCs
 		{
 			if (set && npc.active && npc.releaseOwner != 255 && Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name+"Buff")) < 0)
 			{
-				if (Main.myPlayer == npc.releaseOwner)
-				{
-					Main.NewText(npc.name +", ok! Come back!");
-				}
+				//Main.NewText(npc.name +", ok! Come back!");
+                combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[npc.releaseOwner].position.X, (int)Main.player[npc.releaseOwner].position.Y, npc.width, npc.height), PokemonText, npc.name + ", ok! Come back!", false, false);
+                if (Main.netMode == 2 && combatTextNum != 100)
+                {
+                    CombatText combatText = Main.combatText[combatTextNum];
+                    NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                }
 				npc.life = 0;
 				npc.active = false;
 				npc.netUpdate = true;
@@ -821,8 +813,54 @@ namespace PokeModRed.NPCs
 		{
 			return 1.0f;
 		}
-		
-		public float NatureMultipler(string stat)
+
+        public void FaceTarget(NPC target)
+        {
+            npc.targetRect = new Rectangle((int)target.position.X, (int)target.position.Y, (int)target.width, (int)target.height);
+            npc.direction = 1;
+            if ((float)(npc.targetRect.X + npc.targetRect.Width / 2) < npc.position.X + (float)(npc.width / 2))
+            {
+                npc.direction = -1;
+            }
+            npc.directionY = 1;
+            if ((float)(npc.targetRect.Y + npc.targetRect.Height / 2) < npc.position.Y + (float)(npc.height / 2))
+            {
+                npc.directionY = -1;
+            }
+            if (npc.confused)
+			{
+				npc.direction *= -1;
+			}
+            if ((npc.direction != npc.oldDirection || npc.directionY != npc.oldDirectionY || npc.target != npc.oldTarget) && !npc.collideX && !npc.collideY)
+            {
+                npc.netUpdate = true;
+            }
+        }
+
+        public void FaceTarget(Vector2 pos, float width, float height)
+        {
+            npc.targetRect = new Rectangle((int)pos.X, (int)pos.Y, (int)width, (int)height);
+            npc.direction = 1;
+            if ((float)(npc.targetRect.X + npc.targetRect.Width / 2) < npc.position.X + (float)(npc.width / 2))
+            {
+                npc.direction = -1;
+            }
+            npc.directionY = 1;
+            if ((float)(npc.targetRect.Y + npc.targetRect.Height / 2) < npc.position.Y + (float)(npc.height / 2))
+            {
+                npc.directionY = -1;
+            }
+            if (npc.confused)
+            {
+                npc.direction *= -1;
+            }
+            if ((npc.direction != npc.oldDirection || npc.directionY != npc.oldDirectionY || npc.target != npc.oldTarget) && !npc.collideX && !npc.collideY)
+            {
+                npc.netUpdate = true;
+            }
+        }
+
+        public float NatureMultipler(string stat)
 		{
 			if (nature == 1 || nature == 7 || nature == 13 || nature == 19 || nature == 25){
 				return 1f;

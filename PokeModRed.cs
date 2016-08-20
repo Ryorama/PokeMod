@@ -7,6 +7,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using PokeModRed.NPCs;
+using System.IO;
 
 namespace PokeModRed
 {
@@ -16,15 +17,17 @@ namespace PokeModRed
         public static IDictionary<int, float> originalSpawnPool;
         private double pressedSpawnToggleHotKeyTime;
 
-        public override void SetModInfo(out string name, ref ModProperties properties)
-		{
-			name = "PokeModRed";
-			properties.Autoload = true;
-			properties.AutoloadGores = true;
-			properties.AutoloadSounds = true;
-		}
-		
-		public override void Load()
+        public PokeModRed()
+        {
+            Properties = new ModProperties()
+            {
+                Autoload = true,
+                AutoloadGores = true,
+                AutoloadSounds = true
+            };
+        }
+
+        public override void Load()
 		{
 			Pokedex.DoNothing();
             RegisterHotKey("Activate/Deactivate Pokemon Spawns", "P");
@@ -104,5 +107,27 @@ namespace PokeModRed
 				}
 			}
 		}
-	}
+
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {
+            PokeModMessageType msgType = (PokeModMessageType)reader.ReadByte();
+            switch (msgType)
+            {
+                // This message sent by the player when they load to initialize the custom Pokemon Weapon Data for all players
+                case PokeModMessageType.SetPokemonWeaponData:
+                    //int tremorTime = reader.ReadInt32();
+                    //ExampleWorld world = (ExampleWorld)GetModWorld("ExampleWorld");
+                    //world.VolcanoTremorTime = tremorTime;
+                    break;
+                default:
+                    ErrorLogger.Log("PokeMod: Unknown Message type: " + msgType);
+                    break;
+            }
+        }
+    }
+
+    enum PokeModMessageType : byte
+    {
+        SetPokemonWeaponData,
+    }
 }

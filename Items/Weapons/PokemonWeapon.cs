@@ -232,10 +232,15 @@ namespace PokeModRed.Items.Weapons
 			SpAIV = (byte)rnd.Next(0,31);
 			SpDIV = (byte)rnd.Next(0,31);
 			SpeIV = (byte)rnd.Next(0,31);
-			level = 1;
+            HPEV = 0;
+            AtkEV = 0;
+            DefEV = 0;
+            SpAEV = 0;
+            SpDEV = 0;
+            SpeEV = 0;
+            level = 5;
 			experience = 0;
-			originalTrainer = Main.player[Main.myPlayer].name;
-			SetToolTip();
+            originalTrainer = Main.player[Main.myPlayer].name;
 			item.damage = 0; // THIS USE TO BE Atk MAKE SURE RESULTING NPC DOESN'T LOOK TO THIS ITEMS DAMAGE FOR ITS DAMAGE
 			item.width = 40;
 			item.height = 40;
@@ -255,18 +260,19 @@ namespace PokeModRed.Items.Weapons
 			item.makeNPC = (short)mod.NPCType(item.name);
 			item.noUseGraphic = true;
 			item.useSound = mod.GetSoundSlot(SoundType.Item, "Sounds/Item/id"+((int)id).ToString());
-		}
+            SetToolTip();
+        }
 		
 		public override bool UseItem(Player player)
 		{
-			PokePlayer modPlayer = (PokePlayer)player.GetModPlayer(mod, "PokePlayer");
+            PokePlayer modPlayer = (PokePlayer)player.GetModPlayer(mod, "PokePlayer");
 			// need to put a limiter on this, max 1 per item
 			if (player.HasBuff(mod.BuffType(Name + "Buff")) < 0 && player.itemTime == 0 && player.itemAnimation > 0 && player.controlUseItem)
 			{
-				if (Main.netMode != 1)
-				{
-					NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
-				}
+                if (Main.netMode != 1)
+                {
+                    NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
+                }
 			}
 			return true;
 		}
@@ -326,7 +332,7 @@ namespace PokeModRed.Items.Weapons
 
 		public override void LoadCustomData(BinaryReader reader)
 		{
-			level = reader.ReadByte();
+            level = reader.ReadByte();
 			experience = reader.ReadInt32();
 			nature = reader.ReadByte();
 			HPIV = reader.ReadByte();
@@ -343,9 +349,31 @@ namespace PokeModRed.Items.Weapons
 			SpeEV = reader.ReadByte();
 			originalTrainer = reader.ReadString();
 			SetToolTip();
-		}
-		
-		public void SetToolTip()
+            /*
+            Main.NewText("Netmode is: " + Main.netMode.ToString());
+            var netMessage = mod.GetPacket();
+            netMessage.Write((byte)PokeModMessageType.SetPokemonWeaponData);
+            netMessage.Write(item.whoAmI); //which item this is
+            netMessage.Write(level);
+            netMessage.Write(experience);
+            netMessage.Write(nature);
+            netMessage.Write(HPIV);
+            netMessage.Write(HPEV);
+            netMessage.Write(AtkIV);
+            netMessage.Write(AtkEV);
+            netMessage.Write(DefIV);
+            netMessage.Write(DefEV);
+            netMessage.Write(SpAIV);
+            netMessage.Write(SpAEV);
+            netMessage.Write(SpDIV);
+            netMessage.Write(SpDEV);
+            netMessage.Write(SpeIV);
+            netMessage.Write(SpeEV);
+            netMessage.Write(originalTrainer);
+            netMessage.Send();*/
+        }
+
+        public void SetToolTip()
 		{
 			if (this.CanRightClick())
 			{
@@ -569,35 +597,35 @@ namespace PokeModRed.Items.Weapons
 					{
 						AtkEV=255;
 					} else {
-						AtkEV=(byte)kvp.Key;
+						AtkEV+=(byte)kvp.Key;
 					}
 				} else if (kvp.Value == "Def"){
 					if (DefEV+(byte)kvp.Key < DefEV)
 					{
 						DefEV=255;
 					} else {
-						DefEV=(byte)kvp.Key;
+						DefEV+=(byte)kvp.Key;
 					}
 				} else if (kvp.Value == "SpA"){
 					if (SpAEV+(byte)kvp.Key < SpAEV)
 					{
 						SpAEV=255;
 					} else {
-						SpAEV=(byte)kvp.Key;
+						SpAEV+=(byte)kvp.Key;
 					}
 				} else if (kvp.Value == "SpD"){
 					if (SpDEV+(byte)kvp.Key < SpDEV)
 					{
 						SpDEV=255;
 					} else {
-						SpDEV=(byte)kvp.Key;
+						SpDEV+=(byte)kvp.Key;
 					}
 				} else if (kvp.Value == "Spe"){
 					if (SpeEV+(byte)kvp.Key < SpeEV)
 					{
 						SpeEV=255;
 					} else {
-						SpeEV=(byte)kvp.Key;
+						SpeEV+=(byte)kvp.Key;
 					}
 				}
 			}

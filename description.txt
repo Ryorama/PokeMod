@@ -1,10 +1,9 @@
-v0.3a Changelog:
-Temporarily disabled pokemon special attacks for now, all essentially just have "tackle"
-Added JSON for entire Pokedex including all Pokemon stats (no more data entry yay!)
-Added "/pokedex [national id]" command
-Added Pokemon Natures, EV's and IV's, all stats pulled from Pokedex for species defaults
-Added Evolution
-Added Pidgey, Charmeleon, Charizard, Wartortle, Blastoise, Metapod, Butterfree, Kakuna, Beedrill, Pidgeotto, Pidgeot and Raticate
-Added Exp gain and EV gain based on the Pokemon defeated
-Only Pokemon with a level 1-5 spawn, spawn rates lowered.
-Added vanity hat "Red Cap", sold by Clothier.
+v0.4 Changelog:
+Pokemon are now npcs instead of projectiles, and friendly and enemy pokemon use the same AI
+There is a different AI for walking, flying and swimming pokemon
+Ranged attacks temporarily disabled
+Added lots more pokemon (60 in total!)
+Added sounds (Pokemon cries, hit sounds)
+Added /gift command with special gift codes already sent to contributers
+Added combat text for summon, unsummon, catch with pokeball
+
