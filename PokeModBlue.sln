@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeModRed", "PokeModRed.csproj", "{A6C2193B-79FB-4A10-ADA3-D572DB20CD51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeModBlue", "PokeModBlue.csproj", "{A6C2193B-79FB-4A10-ADA3-D572DB20CD51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

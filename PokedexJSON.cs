@@ -1,4 +1,4 @@
-namespace PokeModRed
+namespace PokeModBlue
 {
 	public static class PokedexJSON
 	{
@@ -4485,8 +4485,8 @@ namespace PokeModRed
 			'Egg_Group_II':'Dragon',
 			'Catch':255,
 			'EXP':1250000,
-			'EvolveLevel':null,
-			'EvolveID':null,
+			'EvolveLevel':20,
+			'EvolveID':130,
 			'Joh':76,
 			'Hoe':52,
 			'Sin':23,

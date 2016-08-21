@@ -11,7 +11,7 @@ using System.Text;
 using Terraria.Social;
 using Terraria.Utilities;
 
-namespace PokeModRed
+namespace PokeModBlue
 {
 	public class PokedexEntryConverter : CustomCreationConverter<IPokedexEntry>
 	{

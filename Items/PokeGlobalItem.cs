@@ -3,9 +3,9 @@ using Terraria.UI;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PokeModBlue.Items.Weapons;
 
-
-namespace PokeModRed.Items
+namespace PokeModBlue.Items
 {
     public class PokeGlobalItem : GlobalItem
     {

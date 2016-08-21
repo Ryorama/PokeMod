@@ -1,4 +1,4 @@
-namespace PokeModRed
+namespace PokeModBlue
 {	
 	public class PokedexEntry : IPokedexEntry 
 	{

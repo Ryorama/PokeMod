@@ -2,9 +2,9 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PokeModRed.Items.Weapons;
+using PokeModBlue.Items.Weapons;
 
-namespace PokeModRed.NPCs
+namespace PokeModBlue.NPCs
 {
     public class Dratini : PokemonNPC
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Buffs
+namespace PokeModBlue.Buffs
 {
 	public abstract class PokeBuff : ModBuff
 	{
@@ -28,7 +28,8 @@ namespace PokeModRed.Buffs
 			Main.buffTip[Type] = Name +" will fight for you";
 			Main.buffNoSave[Type] = true;
 			Main.buffNoTimeDisplay[Type] = true;
-		}
+            Main.vanityPet[Type] = true;
+        }
 
 		public override void Update(Player player, ref int buffIndex)
 		{

@@ -6,18 +6,18 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PokeModRed.NPCs;
+using PokeModBlue.NPCs;
 using System.IO;
 
-namespace PokeModRed
+namespace PokeModBlue
 {
-	public partial class PokeModRed : Mod
+	public partial class PokeModBlue : Mod
 	{
         public static byte pokeSpawns = 1;
         public static IDictionary<int, float> originalSpawnPool;
         private double pressedSpawnToggleHotKeyTime;
 
-        public PokeModRed()
+        public PokeModBlue()
         {
             Properties = new ModProperties()
             {

@@ -1,9 +1,8 @@
 author = Unown
-version = 0.4
+version = 0.5.2
 displayName = PokeMod
 homepage = http://forums.terraria.org/index.php?threads/pokemod.40542/
 hideCode = true
 hideResources = true
 includeSource = false
 buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, .git\*, .gitattributes, .gitignore, packages\*, properties\*
-includePDB = true

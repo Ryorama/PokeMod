@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Items.Armor
+namespace PokeModBlue.Items.Armor
 {
 	public class RedCap : ModItem
 	{

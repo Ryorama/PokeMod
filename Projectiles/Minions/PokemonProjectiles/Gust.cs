@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Projectiles.Minions.PokemonProjectiles
+namespace PokeModBlue.Projectiles.Minions.PokemonProjectiles
 {
 	public class Gust : PokemonProjectile
 	{

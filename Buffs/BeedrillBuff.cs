@@ -2,7 +2,7 @@ using System;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Buffs {
+namespace PokeModBlue.Buffs {
 
 	public class BeedrillBuff : PokeBuff
 	{

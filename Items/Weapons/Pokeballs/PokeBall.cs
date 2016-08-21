@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Items.Weapons.Pokeballs
+namespace PokeModBlue.Items.Weapons.Pokeballs
 {
 	public class PokeBall : ModItem
 	{		

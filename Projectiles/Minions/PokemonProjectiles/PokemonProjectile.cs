@@ -1,9 +1,9 @@
 using System;
 using Terraria;
 using Terraria.ModLoader;
-using PokeModRed.Items.Weapons;
+using PokeModBlue.Items.Weapons;
 
-namespace PokeModRed.Projectiles.Minions.PokemonProjectiles
+namespace PokeModBlue.Projectiles.Minions.PokemonProjectiles
 {
 	public abstract class PokemonProjectile : ModProjectile
 	{

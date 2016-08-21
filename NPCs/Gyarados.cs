@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace PokeModRed.NPCs {
+namespace PokeModBlue.NPCs {
 
 	public class Gyarados : PokemonNPC
 	{
@@ -13,9 +13,10 @@ namespace PokeModRed.NPCs {
 		public override void SetDefaults()
 		{
 			base.SetDefaults();
-			npc.width = 20;
-			npc.height = 20;
+			npc.width = 120;
+			npc.height = 102;
 			Main.npcFrameCount[npc.type] = 3;
-		}
+            drawOffsetY = 10;
+        }
 	}
 }

@@ -6,10 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PokeModRed.Items.Weapons;
-using PokeModRed.Projectiles.Minions.PokemonProjectiles;
+using PokeModBlue.Items.Weapons;
+using PokeModBlue.Projectiles.Minions.PokemonProjectiles;
 
-namespace PokeModRed.NPCs
+namespace PokeModBlue.NPCs
 {
 	public abstract class PokemonNPC : ModNPC
 	{	
@@ -28,7 +28,7 @@ namespace PokeModRed.NPCs
 		public byte SpeIV;
 		
 		// once and then on level up
-		public byte level;
+		public byte level = 1;
 		public byte HPEV;
 		public byte AtkEV;
 		public byte DefEV;
@@ -38,7 +38,7 @@ namespace PokeModRed.NPCs
 		
 		// internals
 		public PokemonWeapon pokemon; //does this need to be synced?
-		private bool set = false;
+		private bool set = true;
         public float movSpeed;
         int combatTextNum;
         //private bool netUpdate = true;
@@ -48,7 +48,7 @@ namespace PokeModRed.NPCs
         public virtual float id {get; protected set;}
 		public virtual float idleAccel {get{return 0.978f;}}
 		public virtual float spacingMult {get{return 1f;}}
-		public virtual float viewDist {get{return 400f;}}
+		public virtual float viewDist {get{return 450f;}}
 		public virtual float chaseDist {get{return 75f;}}
 		public virtual float chaseAccel {get{return 6f;}}
 		public virtual float inertia {get{return 40f;}}
@@ -274,7 +274,7 @@ namespace PokeModRed.NPCs
 		}		
 		
 		public override void SetDefaults()
-		{				
+		{
 			npc.name = Name;
 			Random rnd = new Random();
 			nature = (byte)rnd.Next(1,25);
@@ -290,7 +290,7 @@ namespace PokeModRed.NPCs
             SpAEV = 0;
             SpDEV = 0;
             SpeEV = 0;
-			int spawnLevel = 1;
+			int spawnLevel = 2;
 			int spawnFactor = 2;
 			if (NPC.downedBoss1){spawnLevel+=spawnFactor;}
 			if (NPC.downedBoss2){spawnLevel+=spawnFactor;}
@@ -303,7 +303,7 @@ namespace PokeModRed.NPCs
 			if (NPC.downedPlantBoss){spawnLevel+=spawnFactor;}
 			if (NPC.downedGolemBoss){spawnLevel+=spawnFactor;}
 			if (NPC.downedAncientCultist){spawnLevel+=spawnFactor;}			
-			level = (byte)rnd.Next(spawnLevel,spawnLevel+4);
+			level = (byte)rnd.Next(spawnLevel,spawnLevel+spawnLevel/2);
 			npc.displayName = npc.name;
 			npc.displayName = "Lvl " +level.ToString() +" " +npc.name; //WORKS BUT MAKES DEBUGGING WITH /npc DIFFICULT AS YOU NEED TO TYPE /npc Lvl # Caterpie TO GET A CATERPIE
 			npc.friendly = true;
@@ -314,8 +314,13 @@ namespace PokeModRed.NPCs
 			npc.knockBackResist = 1.0f;
 			Main.npcCatchable[mod.NPCType(npc.name)] = true;
 			npc.soundHit = mod.GetSoundSlot(SoundType.NPCHit, "Sounds/NPCHit/NormalDamage");
-			npc.soundKilled = mod.GetSoundSlot(SoundType.NPCKilled, "Sounds/NPCKilled/id"+((int)id).ToString());
-		}
+            if (ModLoader.GetMod("PokeModBlueSounds") != null)
+            {
+                npc.soundKilled = ModLoader.GetMod("PokeModBlueSounds").GetSoundSlot(SoundType.NPCKilled, "Sounds/NPCKilled/id" + ((int)id).ToString());
+            }
+            set = false;
+
+        }
 		
         /*
 		public override void SendExtraAI(BinaryWriter writer)
@@ -450,13 +455,14 @@ namespace PokeModRed.NPCs
                 }
             }
 
+
             //attack target
             if (targetPos != npc.position) // if there is a target
             {
                 // get the distance between this and it's target
                 direction = targetPos - npc.Center;
-                // if the distance is greater than 'chaseDist', the distance this engages enemies from
-                if (direction.Length() > 10.0f)
+                // if the distance is less than 'viewDist', the distance this sees enemies from
+                if (direction.Length() < viewDist)
                 {
                     // then move toward the target
                     //direction.Normalize();
@@ -729,6 +735,7 @@ namespace PokeModRed.NPCs
             int itemRef = Item.NewItem((int)npc.position.X, (int)npc.position.Y, 1, 1, mod.ItemType(Name+"Pokeball"), 1, false, 0, false, false);
             PokemonWeapon newItem;
             newItem = Main.item[itemRef].modItem as PokemonWeapon;
+            newItem.SetDefaults();
             newItem.level = this.level;
             newItem.nature = this.nature;
             newItem.experience = 0;
@@ -764,8 +771,8 @@ namespace PokeModRed.NPCs
 			}
 			return true;
 		}
-		
-		public override bool CheckActive()
+
+        public override bool CheckActive()
 		{
 			if (set && npc.active && npc.releaseOwner != 255 && Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name+"Buff")) < 0)
 			{
@@ -995,7 +1002,7 @@ namespace PokeModRed.NPCs
 		// Acts as a multiplier to reduce or increase all Pokemon spawns
 		public override float CanSpawn(NPCSpawnInfo spawnInfo)
 		{
-            if (PokeModRed.pokeSpawns == 3)
+            if (PokeModBlue.pokeSpawns == 3)
             {
                 return 0f;
             } else if (catchRate > 235)

@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace PokeModRed.NPCs
+namespace PokeModBlue.NPCs
 {
 	public class Arbok : PokemonNPC
 	{	

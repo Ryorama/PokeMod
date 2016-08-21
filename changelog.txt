@@ -1,9 +1,0 @@
-v0.3
-Temporarily disabled pokemon special attacks for now, all essentially just have "tackle"
-Added JSON for entire Pokedex including all Pokemon stats (no more data entry yay!)
-Added "/pokedex [national id]" command
-Added Pokemon Natures, EV's and IV's, all stats pulled from Pokedex for species defaults
-Added Pidgey, Charmeleon, Charizard, Wartortle, Blastoise, Metapod, Butterfree, Kakuna,
-	Beedrill, Pidgeotto, Pidgeot and Raticate
-Added Exp gain and EV gain based on the pokemon defeated
-Added Evolution

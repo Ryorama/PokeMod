@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PokeModRed.Projectiles.Minions;
-using PokeModRed.Projectiles.Minions.PokemonProjectiles;
-using PokeModRed.Items.Weapons;
+using PokeModBlue.Projectiles.Minions;
+using PokeModBlue.Projectiles.Minions.PokemonProjectiles;
+using PokeModBlue.Items.Weapons;
 
-namespace PokeModRed.NPCs
+namespace PokeModBlue.NPCs
 {
     public class PokeGlobalNPC : GlobalNPC
     {
@@ -116,7 +116,7 @@ namespace PokeModRed.NPCs
 
         public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
         {
-            PokeModRed.originalSpawnPool = pool;
+            PokeModBlue.originalSpawnPool = pool;
             
             List<int> keys = new List<int>(pool.Keys);
             foreach (int key in keys)
@@ -124,15 +124,15 @@ namespace PokeModRed.NPCs
                 ModNPC modNPC = NPCLoader.GetNPC(key);
                 if (modNPC == null) // if the ModNPC returned is empty it is a vanilla NPC
                 {
-                    if (PokeModRed.pokeSpawns == 2)
+                    if (PokeModBlue.pokeSpawns == 2)
                     {
                         //edit the value of pool at [key]
                         pool[key] = 0f;
                     }
-                    else if (PokeModRed.pokeSpawns == 3 || PokeModRed.pokeSpawns == 1)
+                    else if (PokeModBlue.pokeSpawns == 3 || PokeModBlue.pokeSpawns == 1)
                     {
                         //edit the value of pool at [key]
-                        pool[key] = PokeModRed.originalSpawnPool[key];
+                        pool[key] = PokeModBlue.originalSpawnPool[key];
                     }
                 }
             }

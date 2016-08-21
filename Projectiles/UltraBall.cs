@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PokeModRed.NPCs;
+using PokeModBlue.NPCs;
 
-namespace PokeModRed.Projectiles
+namespace PokeModBlue.Projectiles
 {
 	public class UltraBall : PokeballProjectile
 	{

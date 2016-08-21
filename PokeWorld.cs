@@ -6,9 +6,9 @@ using Terraria.ModLoader;
 using Terraria.World.Generation;
 using Microsoft.Xna.Framework;
 using System;
-using PokeModRed.Items.Weapons;
+using PokeModBlue.Items.Weapons;
 
-namespace PokeModRed
+namespace PokeModBlue
 {
 	public class PokeWorld : ModWorld
 	{

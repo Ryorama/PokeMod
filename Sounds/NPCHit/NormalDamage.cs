@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework.Audio;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Sounds.Item
+namespace PokeModBlue.Sounds.Item
 {
 	public class NormalDamage : ModSound
 	{

@@ -6,9 +6,9 @@ using Terraria.ModLoader;
 
 namespace PokeModBlue.Items.Weapons {
 
-	public class SandshrewPokeball : PokemonWeapon
+	public class MunchlaxPokeball : PokemonWeapon
 	{
-		public override float id {get{return 27f;}}
+		public override float id {get{return 446f;}}
 		
 		public override void SetDefaults()
 		{

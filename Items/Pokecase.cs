@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Items
+namespace PokeModBlue.Items
 {
 	public class Pokecase : ModItem
 	{

@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework.Audio;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Sounds.Custom
+namespace PokeModBlue.Sounds.Custom
 {
 	public class ExpFull : ModSound
 	{

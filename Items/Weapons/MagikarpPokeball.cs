@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace PokeModRed.Items.Weapons {
+namespace PokeModBlue.Items.Weapons {
 
 	public class MagikarpPokeball : PokemonWeapon
 	{

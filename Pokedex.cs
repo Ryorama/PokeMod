@@ -11,7 +11,7 @@ using System.Text;
 using Terraria.Social;
 using Terraria.Utilities;
 
-namespace PokeModRed
+namespace PokeModBlue
 {
 	public static class Pokedex
 	{
@@ -32,7 +32,7 @@ namespace PokeModRed
 					writer.WriteLine("using Terraria.ID;");
 					writer.WriteLine("using Terraria.ModLoader;");
 					writer.WriteLine("");
-					writer.WriteLine("namespace PokeModRed.Items.Weapons {");
+					writer.WriteLine("namespace PokeModBlue.Items.Weapons {");
 					writer.WriteLine("");
 					writer.WriteLine("	public class " +_pokedexEntry.Pokemon +"Pokeball : PokemonWeapon");
 					writer.WriteLine("	{");
@@ -51,7 +51,7 @@ namespace PokeModRed
 					writer.WriteLine("using Terraria;");
 					writer.WriteLine("using Terraria.ModLoader;");
 					writer.WriteLine("");
-					writer.WriteLine("namespace PokeModRed.Buffs {");
+					writer.WriteLine("namespace PokeModBlue.Buffs {");
 					writer.WriteLine("");
 					writer.WriteLine("	public class " +_pokedexEntry.Pokemon +"Buff" +" : PokeBuff");
 					writer.WriteLine("	{");
@@ -67,7 +67,7 @@ namespace PokeModRed
 					writer.WriteLine("using Terraria.ID;");
 					writer.WriteLine("using Terraria.ModLoader;");
 					writer.WriteLine("");
-					writer.WriteLine("namespace PokeModRed.NPCs {");
+					writer.WriteLine("namespace PokeModBlue.NPCs {");
 					writer.WriteLine("");
 					writer.WriteLine("	public class " +_pokedexEntry.Pokemon +" : PokemonNPC");
 					writer.WriteLine("	{");
@@ -89,7 +89,7 @@ namespace PokeModRed
 					writer.WriteLine("using Terraria;");
 					writer.WriteLine("using Terraria.ModLoader;");
 					writer.WriteLine("");
-					writer.WriteLine("namespace PokeModRed.Sounds.Item");
+					writer.WriteLine("namespace PokeModBlue.Sounds.Item");
 					writer.WriteLine("{");
 					writer.WriteLine("	public class " +"id" +_pokedexEntry.Nat +" : ModSound");
 					writer.WriteLine("	{");
@@ -110,7 +110,7 @@ namespace PokeModRed
 					writer.WriteLine("using Terraria;");
 					writer.WriteLine("using Terraria.ModLoader;");
 					writer.WriteLine("");
-					writer.WriteLine("namespace PokeModRed.Sounds.NPCKilled");
+					writer.WriteLine("namespace PokeModBlue.Sounds.NPCKilled");
 					writer.WriteLine("{");
 					writer.WriteLine("	public class " +"id" +_pokedexEntry.Nat +" : ModSound");
 					writer.WriteLine("	{");

@@ -7,10 +7,10 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PokeModRed.Items.Weapons;
+using PokeModBlue.Items.Weapons;
 
 
-namespace PokeModRed
+namespace PokeModBlue
 {
 	public class PokePlayer : ModPlayer
 	{

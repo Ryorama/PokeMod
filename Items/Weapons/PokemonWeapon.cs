@@ -5,19 +5,22 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PokeModRed;
-using PokeModRed.NPCs;
+using PokeModBlue;
+using PokeModBlue.NPCs;
 
-namespace PokeModRed.Items.Weapons
+namespace PokeModBlue.Items.Weapons
 {
 
 	public abstract class PokemonWeapon : ModItem
-	{	
-		public int experience;
+	{
+        int combatTextNum;
+        public static Color PokemonText = new Color(255, 255, 255, 255);
+
+        public int experience;
 		public byte level;
 		public byte nature;
 		public byte HPIV, HPEV, AtkIV, AtkEV, DefIV, DefEV, SpAIV, SpAEV, SpDIV, SpDEV, SpeIV, SpeEV;
-		public string originalTrainer;
+		public string originalTrainer = "";
 		
 		public const byte Hardy = 1;
 		public const byte Lonely = 2;
@@ -223,7 +226,7 @@ namespace PokeModRed.Items.Weapons
 		
 		public override void SetDefaults()
 		{
-			item.name = Name;
+            item.name = Name;
 			Random rnd = new Random();
 			nature = (byte)rnd.Next(1,25);
 			HPIV = (byte)rnd.Next(0,31);
@@ -241,29 +244,41 @@ namespace PokeModRed.Items.Weapons
             level = 5;
 			experience = 0;
             originalTrainer = Main.player[Main.myPlayer].name;
-			item.damage = 0; // THIS USE TO BE Atk MAKE SURE RESULTING NPC DOESN'T LOOK TO THIS ITEMS DAMAGE FOR ITS DAMAGE
 			item.width = 40;
 			item.height = 40;
-			item.summon = true;
-			item.mana = 1;
-			item.useTime = 36;
-			item.useAnimation = 36;
-			item.useStyle = 1;
-			item.knockBack = 3;
-			item.rare = 9;
-			item.useStyle = 1;
-			item.autoReuse = true;
-			item.useTurn = true;
-			item.useAnimation = 15;
-			item.useTime = 10;
-			Main.npcCatchable[mod.NPCType(item.name)] = true;
+            item.damage = 0;
+            item.useStyle = 1;
+            item.useTime = 20;
+            item.useAnimation = 20;
+            item.noMelee = true;
+            item.rare = 9;
+            item.buffType = mod.BuffType(Name + "Buff");
+            Main.npcCatchable[mod.NPCType(item.name)] = true;
 			item.makeNPC = (short)mod.NPCType(item.name);
 			item.noUseGraphic = true;
-			item.useSound = mod.GetSoundSlot(SoundType.Item, "Sounds/Item/id"+((int)id).ToString());
+            if (ModLoader.GetMod("PokeModBlueSounds")!=null) {
+                item.useSound = ModLoader.GetMod("PokeModBlueSounds").GetSoundSlot(SoundType.Item, "Sounds/Item/id" + ((int)id).ToString());
+            }
             SetToolTip();
         }
-		
-		public override bool UseItem(Player player)
+
+        public override void OnCraft(Recipe recipe)
+        {
+            base.OnCraft(recipe);
+            this.SetDefaults();
+        }
+
+        public override bool CanUseItem(Player player)
+        {
+            if (player.selectedItem == 58)
+            {
+                return false;            
+            } else {
+                return true;
+            }
+        }
+
+        public override bool UseItem(Player player)
 		{
             PokePlayer modPlayer = (PokePlayer)player.GetModPlayer(mod, "PokePlayer");
 			// need to put a limiter on this, max 1 per item
@@ -274,7 +289,7 @@ namespace PokeModRed.Items.Weapons
                     NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
                 }
 			}
-			return true;
+            return true;
 		}
 		
 		public override void GetWeaponDamage(Player player, ref int damage)
@@ -312,26 +327,27 @@ namespace PokeModRed.Items.Weapons
 		
 		public override void SaveCustomData(BinaryWriter writer)
 		{
-			writer.Write(level);
-			writer.Write(experience);
-			writer.Write(nature);
-			writer.Write(HPIV);
-			writer.Write(HPEV);
-			writer.Write(AtkIV);
-			writer.Write(AtkEV);
-			writer.Write(DefIV);
-			writer.Write(DefEV);
-			writer.Write(SpAIV);
-			writer.Write(SpAEV);
-			writer.Write(SpDIV);
-			writer.Write(SpDEV);
-			writer.Write(SpeIV);
-			writer.Write(SpeEV);
-			writer.Write(originalTrainer);
+            writer.Write(level);
+            writer.Write(experience);
+            writer.Write(nature);
+            writer.Write(HPIV);
+            writer.Write(HPEV);
+            writer.Write(AtkIV);
+            writer.Write(AtkEV);
+            writer.Write(DefIV);
+            writer.Write(DefEV);
+            writer.Write(SpAIV);
+            writer.Write(SpAEV);
+            writer.Write(SpDIV);
+            writer.Write(SpDEV);
+            writer.Write(SpeIV);
+            writer.Write(SpeEV);
+            writer.Write(originalTrainer);
 		}
 
 		public override void LoadCustomData(BinaryReader reader)
 		{
+            SetDefaults();
             level = reader.ReadByte();
 			experience = reader.ReadInt32();
 			nature = reader.ReadByte();
@@ -504,7 +520,7 @@ namespace PokeModRed.Items.Weapons
 					return true;
 				}
 			}
-			return false;
+            return false;
 		}
 
 		public override void RightClick(Player player)
@@ -513,11 +529,22 @@ namespace PokeModRed.Items.Weapons
 			Pokedex.pokedex.TryGetValue((float)EvolveID, out val);
 			string evolveName; 
 			evolveName = val.Pokemon;
-			Main.NewText("What? " +item.name +" is evolving!");
-			Main.NewText("Congratulations! Your " +item.name + " evolved in to " +evolveName +"!");
+            combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, "What? " + item.name + " is evolving!", false, false);
+            if (Main.netMode == 2 && combatTextNum != 100)
+            {
+                CombatText combatText = Main.combatText[combatTextNum];
+                NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+            }
+            combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, "Congratulations! Your " + item.name + " evolved in to " + evolveName + "!", false, false);
+            if (Main.netMode == 2 && combatTextNum != 100)
+            {
+                CombatText combatText = Main.combatText[combatTextNum];
+                NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+            }
 			int itemRef = Item.NewItem((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, 1, 1, mod.ItemType(evolveName+"Pokeball"), 1, false, 0, false, false);
 			PokemonWeapon newItem;
 			newItem = Main.item[itemRef].modItem as PokemonWeapon;
+            newItem.SetDefaults();
 			newItem.level = this.level;
 			newItem.nature = this.nature;
 			newItem.experience = this.experience;
@@ -540,7 +567,7 @@ namespace PokeModRed.Items.Weapons
 			newItem.SetToolTip();
 			this.item.consumable = true;
 			this.item.active = false;
-		}
+        }
 		
 		// Add exp points for vanilla monsters
 		public void AddExperience(int xp, int psuedoLevel)
@@ -640,8 +667,14 @@ namespace PokeModRed.Items.Weapons
 				while (experience >= GetExpForLevel(level+1))
 				{
 					experience -= GetExpForLevel(level+1);
-					Main.PlaySound(2, (int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, mod.GetSoundSlot(SoundType.Item, "Sounds/Custom/ExpFull"));
-					level += 1;
+                    combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, item.name + " grew to level " + (level+1).ToString() + "!", false, false);
+                    if (Main.netMode == 2 && combatTextNum != 100)
+                    {
+                        CombatText combatText = Main.combatText[combatTextNum];
+                        NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                    }
+                    Main.PlaySound(SoundLoader.customSoundType, -1, -1, mod.GetSoundSlot(SoundType.Custom, "Sounds/Custom/ExpFull"));
+                    level += 1;
 				}
 			}
 		}
