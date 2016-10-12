@@ -321,7 +321,17 @@ namespace PokeModBlue.NPCs
             set = false;
 
         }
-		
+
+        public override bool PreAI()
+        {
+            if (pokemon != null)
+            {
+                pokemon.currentHP = npc.life;
+                pokemon.SetToolTip();
+            }
+            return true;
+        }
+
         /*
 		public override void SendExtraAI(BinaryWriter writer)
 		{
@@ -334,7 +344,7 @@ namespace PokeModBlue.NPCs
 		}
 		*/
 
-		public override void AI()
+        public override void AI()
 		{
             if (!set && npc.releaseOwner != 255)
             {
@@ -346,6 +356,8 @@ namespace PokeModBlue.NPCs
                     NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
                 }
                 pokemon = Main.player[npc.releaseOwner].inventory[Main.player[npc.releaseOwner].selectedItem].modItem as PokemonWeapon;
+                pokemon.npc = this.npc;
+                pokemon.npc.life = pokemon.currentHP;
                 level = pokemon.level;
                 nature = pokemon.nature;
                 HPIV = pokemon.HPIV;
@@ -363,7 +375,6 @@ namespace PokeModBlue.NPCs
                 npc.damage = Atk;
                 npc.defense = Def;
                 npc.lifeMax = maxHP;
-                npc.life = maxHP;
                 Main.player[npc.releaseOwner].AddBuff(mod.BuffType(Name+"Buff"), 3600);
                 npc.displayName = "Lvl " + level.ToString() + " " + npc.name;
                 set = true;
@@ -688,7 +699,13 @@ namespace PokeModBlue.NPCs
                 }
                 Main.player[npc.releaseOwner].DelBuff(Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name+"Buff")));
 			}
-			return true;
+            if (pokemon != null)
+            {
+                pokemon.currentHP = npc.life;
+                pokemon.npc = null;
+                pokemon.SetToolTip();
+            }
+            return true;
 		}
 
         public override bool CheckActive()
@@ -702,10 +719,17 @@ namespace PokeModBlue.NPCs
                     CombatText combatText = Main.combatText[combatTextNum];
                     NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
                 }
-				npc.life = 0;
+                if (pokemon != null)
+                {
+                    pokemon.currentHP = npc.life;
+                    pokemon.npc = null;
+                    pokemon.SetToolTip();
+                }
+                npc.life = 0;
 				npc.active = false;
 				npc.netUpdate = true;
-			}
+
+            }
 			if (npc.friendly)
 			{
 				return false; //doesn't count against max npc limit near players (as they are player summoned and shouldn't reduce total enemy npcs)

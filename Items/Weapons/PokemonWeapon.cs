@@ -13,6 +13,7 @@ namespace PokeModBlue.Items.Weapons
 
 	public abstract class PokemonWeapon : ModItem
 	{
+        public NPC npc;
         int combatTextNum;
         public static Color PokemonText = new Color(255, 255, 255, 255);
 
@@ -21,6 +22,7 @@ namespace PokeModBlue.Items.Weapons
 		public byte nature;
 		public byte HPIV, HPEV, AtkIV, AtkEV, DefIV, DefEV, SpAIV, SpAEV, SpDIV, SpDEV, SpeIV, SpeEV;
 		public string originalTrainer = "";
+        public int currentHP;
 		
 		public const byte Hardy = 1;
 		public const byte Lonely = 2;
@@ -274,13 +276,30 @@ namespace PokeModBlue.Items.Weapons
         {
             if (player.selectedItem == 58)
             {
-                Main.NewText("Use Pokemon from the hotbar to summon.");
+                combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, "Use Pokemon from the hotbar to summon.", false, false);
+                if (Main.netMode == 2 && combatTextNum != 100)
+                {
+                    CombatText combatText = Main.combatText[combatTextNum];
+                    NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                }
                 return false;            
             } else {
-                return true;
-            }
 
-            return true;
+                if (currentHP > 0)
+                {
+                    return true;
+                } else
+                {
+                    combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, item.name +" has no energy left to battle!", false, false);
+                    if (Main.netMode == 2 && combatTextNum != 100)
+                    {
+                        CombatText combatText = Main.combatText[combatTextNum];
+                        NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                    }
+                    return false;
+                }
+                
+            }
         }
 
         public override bool UseItem(Player player)
@@ -289,12 +308,14 @@ namespace PokeModBlue.Items.Weapons
 			// need to put a limiter on this, max 1 per item
 			if (player.HasBuff(mod.BuffType(Name + "Buff")) < 0 && player.itemTime == 0 && player.itemAnimation > 0 && player.controlUseItem)
 			{
-                if (Main.netMode != 1)
+                /*if (Main.netMode != 1)
                 {
-                    //NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
-                    int npc = NPC.NewNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC);
-                    Main.npc[npc].releaseOwner = (byte)player.whoAmI;
-                }               
+                    NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
+                }*/
+                int npc = NPC.NewNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC);
+                Main.npc[npc].releaseOwner = (byte)player.whoAmI;
+                Main.npc[npc].life = currentHP;
+
             }
             return true;
 		}
@@ -350,27 +371,34 @@ namespace PokeModBlue.Items.Weapons
             writer.Write(SpeIV);
             writer.Write(SpeEV);
             writer.Write(originalTrainer);
+            writer.Write((UInt16)currentHP);
 		}
 
-		public override void LoadCustomData(BinaryReader reader)
-		{
+        public override void LoadCustomData(BinaryReader reader)
+        {
             SetDefaults();
             level = reader.ReadByte();
-			experience = reader.ReadInt32();
-			nature = reader.ReadByte();
-			HPIV = reader.ReadByte();
-			HPEV = reader.ReadByte();
-			AtkIV = reader.ReadByte();
-			AtkEV = reader.ReadByte();
-			DefIV = reader.ReadByte();
-			DefEV = reader.ReadByte();
-			SpAIV = reader.ReadByte();
-			SpAEV = reader.ReadByte();
-			SpDIV = reader.ReadByte();
-			SpDEV = reader.ReadByte();
-			SpeIV = reader.ReadByte();
-			SpeEV = reader.ReadByte();
-			originalTrainer = reader.ReadString();
+            experience = reader.ReadInt32();
+            nature = reader.ReadByte();
+            HPIV = reader.ReadByte();
+            HPEV = reader.ReadByte();
+            AtkIV = reader.ReadByte();
+            AtkEV = reader.ReadByte();
+            DefIV = reader.ReadByte();
+            DefEV = reader.ReadByte();
+            SpAIV = reader.ReadByte();
+            SpAEV = reader.ReadByte();
+            SpDIV = reader.ReadByte();
+            SpDEV = reader.ReadByte();
+            SpeIV = reader.ReadByte();
+            SpeEV = reader.ReadByte();
+            originalTrainer = reader.ReadString();
+            try {
+                currentHP = reader.ReadUInt16();
+            } catch (Exception)
+            {
+                currentHP = maxHP;
+            }
 			SetToolTip();
             /*
             Main.NewText("Netmode is: " + Main.netMode.ToString());
@@ -400,10 +428,10 @@ namespace PokeModBlue.Items.Weapons
 		{
 			if (this.CanRightClick())
 			{
-				item.toolTip = "Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " +originalTrainer +System.Environment.NewLine +"Right Click to Evolve!";
+				item.toolTip = "Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " + System.Environment.NewLine + currentHP + "/" + maxHP + " HP" + originalTrainer +System.Environment.NewLine +"Right Click to Evolve!";
 			} else {
-				item.toolTip = "Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " +originalTrainer;
-			}
+				item.toolTip = "Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " +originalTrainer +System.Environment.NewLine +currentHP +"/" +maxHP +" HP";
+            }
 			
 		}
 		

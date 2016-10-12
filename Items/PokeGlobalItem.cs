@@ -82,5 +82,25 @@ namespace PokeModBlue.Items
                 }
             }
         }
-    }
+
+        // Saves Pokemon Weapon custom data
+        public override bool NeedsCustomSaving(Item item)
+        {
+            if (item.modItem != null)
+            {
+                PokemonWeapon pokemonWeapon;
+                pokemonWeapon = item.modItem as PokemonWeapon;
+                if (pokemonWeapon != null)
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }
+            } else
+            {
+                return false;
+            }
+        }
+    }    
 }

@@ -1,5 +1,5 @@
-v0.5.5.4 Changelog:
+v0.6.2 Changelog:
 For tModLoder v0.8.3.4
-Updated for v0.8.3.4, pokemon now spawn from pokeballs again. I really wish every tModLoader update didn't break the mod...
-Pokemon can now be safely stored in chests thanks to a tModLoader update though, good job @bluemagic123 and @jopojelly
-Fixed the PokeNurse texture, she doesn't have a function yet but soon she will be needed to heal Pokemon.
+PokeNurse added and functional, she is always available to spawn, so build her a home and keep her safe.
+PokeNurse is currently the only way to revive fainted Pokemon.
+Pokemon can now faint and will not be possible to summon until healed.

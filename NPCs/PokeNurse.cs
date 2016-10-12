@@ -2,6 +2,7 @@ using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using PokeModBlue.Items.Weapons;
 
 namespace PokeModBlue.NPCs
 {
@@ -9,14 +10,14 @@ namespace PokeModBlue.NPCs
 	{
         public override bool Autoload(ref string name, ref string texture, ref string[] altTextures)
         {
-            name = "Poke Nurse";
+            name = "PokeNurse";
             altTextures = new string[] { "PokeModBlue/NPCs/PokeNurse_Alt_1" };
             return mod.Properties.Autoload;
         }
 
         public override void SetDefaults()
         {
-            npc.name = "Example Person";
+            npc.name = "PokeNurse";
             npc.townNPC = true;
             npc.friendly = true;
             npc.width = 18;
@@ -77,6 +78,21 @@ namespace PokeModBlue.NPCs
                 Main.NewText("Thank you for waiting.");
                 Main.NewText("We've restored your Pokémon to full health.");
                 Main.NewText("We hope to see you again!");
+
+                for (int i = 0; i < Main.player[Main.myPlayer].inventory.Length; i++)
+                {
+                    PokemonWeapon pokemonWeapon = Main.player[Main.myPlayer].inventory[i].modItem as PokemonWeapon;
+                    if (pokemonWeapon != null)
+                    {
+                        pokemonWeapon.currentHP = pokemonWeapon.maxHP;
+                        pokemonWeapon.SetToolTip();
+                        if (pokemonWeapon.npc != null)
+                        {
+                            pokemonWeapon.npc.life = pokemonWeapon.maxHP;
+                            pokemonWeapon.npc.HealEffect(pokemonWeapon.maxHP); 
+                        }
+                    }
+                }
 			}
 		}
 

@@ -1,5 +1,5 @@
 author = Unown
-version = 0.5.5.4
+version = 0.6.2
 displayName = PokeMod
 homepage = http://forums.terraria.org/index.php?threads/pokemod.40542/
 hideCode = true
