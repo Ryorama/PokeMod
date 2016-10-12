@@ -206,6 +206,7 @@
     <Compile Include="NPCs\Pikachu.cs" />
     <Compile Include="NPCs\PokeGlobalNPC.cs" />
     <Compile Include="NPCs\PokemonNPC.cs" />
+    <Compile Include="NPCs\PokeNurse.cs" />
     <Compile Include="NPCs\Raichu.cs" />
     <Compile Include="NPCs\Raticate.cs" />
     <Compile Include="NPCs\Rattata.cs" />
@@ -401,6 +402,8 @@
     <Content Include="NPCs\Pidgeotto.png" />
     <Content Include="NPCs\Pidgey.png" />
     <Content Include="NPCs\Pikachu.png" />
+    <Content Include="NPCs\PokeNurse.png" />
+    <Content Include="NPCs\PokeNurse_Head.png" />
     <Content Include="NPCs\Raichu.png" />
     <Content Include="NPCs\Raticate.png" />
     <Content Include="NPCs\Rattata.png" />

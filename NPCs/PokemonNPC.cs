@@ -49,7 +49,7 @@ namespace PokeModBlue.NPCs
 		public virtual float idleAccel {get{return 0.978f;}}
 		public virtual float spacingMult {get{return 1f;}}
 		public virtual float viewDist {get{return 450f;}}
-		public virtual float chaseDist {get{return 75f;}}
+		public virtual float chaseDist {get{return npc.width*2; }}
 		public virtual float chaseAccel {get{return 6f;}}
 		public virtual float inertia {get{return 40f;}}
 		public virtual float shootCool {get{return 270f;}}
@@ -418,11 +418,8 @@ namespace PokeModBlue.NPCs
                 // if the distance from the player is too great, just instant teleport to the player
                 if ((Main.player[npc.releaseOwner].Center - npc.Center).Length() > 1000f)
                 {
-                    npc.Center = Main.player[npc.releaseOwner].Center;
-                    if (aiMode == flying || (aiMode == swimming && npc.wet))
-                    {
-                        npc.position.Y -= npc.height;
-                    }
+                    npc.position = Main.player[npc.releaseOwner].position;
+                    npc.position.Y = npc.position.Y - npc.height + Main.player[npc.releaseOwner].height;
                 }
 
                 // look for a non friendly npc within sight range and set them as the target
@@ -461,8 +458,8 @@ namespace PokeModBlue.NPCs
             {
                 // get the distance between this and it's target
                 direction = targetPos - npc.Center;
-                // if the distance is less than 'viewDist', the distance this sees enemies from
-                if (direction.Length() < viewDist)
+                // if the distance is less than 'viewDist', the distance this sees enemies from or if it is hurt (to stop players from shooting a Pokemon without it reacting)
+                if (direction.Length() < viewDist || npc.life < npc.lifeMax)
                 {
                     // then move toward the target
                     //direction.Normalize();
@@ -480,11 +477,11 @@ namespace PokeModBlue.NPCs
                     {
                         if (npc.directionY > 0)
                         {
-                            npc.velocity.Y += movSpeed;
+                            npc.velocity.Y += movSpeed * 1.5f;
                         }
                         if (npc.directionY < 0)
                         {
-                            npc.velocity.Y -= movSpeed;
+                            npc.velocity.Y -= movSpeed * 1.5f;
                         }
                     }
 
@@ -493,11 +490,9 @@ namespace PokeModBlue.NPCs
                     {
                         npc.velocity.Y -= movSpeed;
                     }
-                }
-                else
-                {
-                    //otherwise slowly come to a halt
-                    npc.velocity *= (float)Math.Pow(0.97, 40.0 / inertia);
+                } else { // else the target is outside of the view distance
+                    // otherwise slowly come to a halt
+                    npc.velocity.X *= (float)Math.Pow(0.97, 40.0 / inertia);
                 }
                 /*
                 if in melee range
@@ -513,26 +508,49 @@ namespace PokeModBlue.NPCs
                     endif
                 endif      
                 */
-            } else
-            {
+            } else {
                 //idle movement, this is only when there is no valid target to attack
                 if (npc.friendly)
                 {
                     direction = Main.player[npc.releaseOwner].Center - npc.Center;
-                    Vector2 targPos = Main.player[npc.releaseOwner].Center;
+                    Vector2 targPos = Main.player[npc.releaseOwner].position;
+                    distance = direction.Length();
+                    float distanceX = Math.Abs(Main.player[npc.releaseOwner].position.X - npc.position.X);
+
+                    FaceTarget(targPos, Main.player[npc.releaseOwner].width, Main.player[npc.releaseOwner].height);
+
+                    // if flying keep hovering
                     if (aiMode == flying || (aiMode == swimming && npc.wet))
                     {
-                        targPos.Y -= npc.height*2;
-                    }
-                    FaceTarget(targPos, Main.player[npc.releaseOwner].width, Main.player[npc.releaseOwner].height);
-                    distance = direction.Length();
-
-                    if (distance > chaseDist) //TODO here is the issue with flying, once it is within chase distance of player it stops hovering and falls due to gravity
+                        targPos.Y -= npc.height * 2.0f;
+                        if (npc.position.Y - npc.height > targPos.Y - npc.height)
+                        {
+                            npc.velocity.Y -= movSpeed * 1.5f;
+                        }
+                    } else // not flying or a water pokemon currently in water
                     {
-                        // then walk, swim, dig, fly to player, if there is no line of sight to player, it is permissible to turn off collision
-                        // TEMPORARY NO MOVEMENT MODES, BASIC LEFT RIGHT WALKING, NO COLLISION TURNING OFF
-                        //direction.Normalize();
-                        //npc.velocity = (npc.velocity * inertia + direction * chaseAccel) / (inertia + 1);
+                        // if below the player and not currently falling or jumping, jump!
+                        if (npc.velocity.Y == 0 && npc.position.Y > targPos.Y+5)
+                        {
+                            npc.velocity.Y -= movSpeed * 26;
+                            if (distanceX > chaseDist)
+                            {
+                                // have a little boost towards the player
+                                if (npc.direction > 0)
+                                {
+                                    npc.velocity.X += movSpeed*15;
+                                }
+                                if (npc.direction < 0)
+                                {
+                                    npc.velocity.X -= movSpeed*15;
+                                }
+                            }
+                        }
+                    }
+
+                    if (distanceX > chaseDist)
+                    {
+                        // then walk, swim, dig, fly to player
                         if (npc.direction > 0)
                         {
                             npc.velocity.X += movSpeed;
@@ -541,111 +559,12 @@ namespace PokeModBlue.NPCs
                         {
                             npc.velocity.X -= movSpeed;
                         }
-                        // flying should keep moving and maintain height regardless of distance
-                        if (aiMode == flying || (aiMode == swimming && npc.wet))
-                        {
-                            if (npc.directionY > 0)
-                            {
-                                npc.velocity.Y += movSpeed;
-                            } //TODO could make this a else if so it can't move up and down in the one cycle thereby hovering, better for rubber banding
-                            if (npc.directionY < 0)
-                            {
-                                npc.velocity.Y -= movSpeed;
-                            }
-                        }
-                    } else
-                    {
-                        // flying should keep moving and maintain height regardless of distance
-                        if (aiMode == flying || (aiMode == swimming && npc.wet))
-                        {
-                            if (npc.directionY > 0)
-                            {
-                                npc.velocity.Y += movSpeed;
-                            } //TODO could make this a else if so it can't move up and down in the one cycle thereby hovering, better for rubber banding
-                            if (npc.directionY < 0)
-                            {
-                                npc.velocity.Y -= movSpeed;
-                            }
-                        }
                     }
-
                 }
                 else // not friendly
                 {
                     // walk, swim, dig, fly around
-                    // NOT USED YET AS ALL NPCS CAN SEE ANYONE IF THEY EXIST, NOT JUST IN A CERTAIN RANGE
-                }
-            }
-
-            // climb up stairs code
-            bool flag = false;
-            bool flag2 = false;
-            Collision.StepUp(ref npc.position, ref npc.velocity, npc.width, npc.height, ref npc.stepSpeed, ref npc.gfxOffY, 1, false, 0);
-            if (npc.velocity.Y == 0f)
-            {
-                if (npc.velocity.X < 0f || npc.velocity.X > 0f)
-                {
-                    int num102 = (int)(npc.position.X + (float)(npc.width / 2)) / 16;
-                    int j3 = (int)(npc.position.Y + (float)(npc.height / 2)) / 16 + 1;
-                    if (flag)
-                    {
-                        num102--;
-                    }
-                    if (flag2)
-                    {
-                        num102++;
-                    }
-                    WorldGen.SolidTile(num102, j3);
-                }
-                int num103 = (int)(npc.position.X + (float)(npc.width / 2)) / 16;
-                int num104 = (int)(npc.position.Y + (float)npc.height) / 16 + 1;
-                if (WorldGen.SolidTile(num103, num104) || Main.tile[num103, num104].halfBrick() || Main.tile[num103, num104].slope() > 0 || npc.type == 200)
-                {
-                    if (npc.type == 200)
-                    {
-                        npc.velocity.Y = -3.1f;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            num103 = (int)(npc.position.X + (float)(npc.width / 2)) / 16;
-                            num104 = (int)(npc.position.Y + (float)(npc.height / 2)) / 16;
-                            if (flag)
-                            {
-                                num103--;
-                            }
-                            if (flag2)
-                            {
-                                num103++;
-                            }
-                            num103 += (int)npc.velocity.X;
-                            if (!WorldGen.SolidTile(num103, num104 - 1) && !WorldGen.SolidTile(num103, num104 - 2))
-                            {
-                                npc.velocity.Y = -5.1f;
-                            }
-                            else if (!WorldGen.SolidTile(num103, num104 - 2))
-                            {
-                                npc.velocity.Y = -7.1f;
-                            }
-                            else if (WorldGen.SolidTile(num103, num104 - 5))
-                            {
-                                npc.velocity.Y = -11.1f;
-                            }
-                            else if (WorldGen.SolidTile(num103, num104 - 4))
-                            {
-                                npc.velocity.Y = -10.1f;
-                            }
-                            else
-                            {
-                                npc.velocity.Y = -9.1f;
-                            }
-                        }
-                        catch
-                        {
-                            npc.velocity.Y = -9.1f;
-                        }
-                    }
+                    // NOT USED YET
                 }
             }
 

@@ -252,7 +252,7 @@ namespace PokeModBlue.Items.Weapons
             item.useAnimation = 20;
             item.noMelee = true;
             item.rare = 9;
-            item.buffType = mod.BuffType(Name + "Buff");
+            //item.buffType = mod.BuffType(Name + "Buff");
             Main.npcCatchable[mod.NPCType(item.name)] = true;
 			item.makeNPC = (short)mod.NPCType(item.name);
 			item.noUseGraphic = true;
@@ -268,14 +268,19 @@ namespace PokeModBlue.Items.Weapons
             this.SetDefaults();
         }
 
+        // disallow using pokemon weapons if they are picked up and clicked on world, for some reason this deletes their stats
+        // removed for debugging why pokemon aren't spawning as of 1.3.3.2
         public override bool CanUseItem(Player player)
         {
             if (player.selectedItem == 58)
             {
+                Main.NewText("Use Pokemon from the hotbar to summon.");
                 return false;            
             } else {
                 return true;
             }
+
+            return true;
         }
 
         public override bool UseItem(Player player)
@@ -286,9 +291,11 @@ namespace PokeModBlue.Items.Weapons
 			{
                 if (Main.netMode != 1)
                 {
-                    NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
-                }
-			}
+                    //NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
+                    int npc = NPC.NewNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC);
+                    Main.npc[npc].releaseOwner = (byte)player.whoAmI;
+                }               
+            }
             return true;
 		}
 		

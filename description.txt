@@ -1,6 +1,5 @@
-v0.5.2 Changelog:
-Updated for tModLoder v0.8.3.2
-Bugs should be resolved that caused crashes and pokemon to disappear...should.
-You will not be able to summon pokemon by picking them up and clicking in the world,
-use them from the hotbar only.
-If not please let me know on the forums.
+v0.5.5.4 Changelog:
+For tModLoder v0.8.3.4
+Updated for v0.8.3.4, pokemon now spawn from pokeballs again. I really wish every tModLoader update didn't break the mod...
+Pokemon can now be safely stored in chests thanks to a tModLoader update though, good job @bluemagic123 and @jopojelly
+Fixed the PokeNurse texture, she doesn't have a function yet but soon she will be needed to heal Pokemon.

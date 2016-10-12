@@ -13,10 +13,8 @@ namespace PokeModBlue.NPCs
 		public override void SetDefaults()
 		{
 			base.SetDefaults();
-            //npc.width = 46;
-            //npc.height = 46;
-            npc.width = 18;
-            npc.height = 40;
+            npc.width = 46;
+            npc.height = 46;
 			Main.npcFrameCount[npc.type] = 3;
 		}
 
