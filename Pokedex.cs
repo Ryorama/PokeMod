@@ -67,7 +67,7 @@ namespace PokeModBlue
 					writer.WriteLine("using Terraria.ID;");
 					writer.WriteLine("using Terraria.ModLoader;");
 					writer.WriteLine("");
-					writer.WriteLine("namespace PokeModBlue.NPCs {");
+					writer.WriteLine("namespace PokeModBlue.NPCs.Pokemon {");
 					writer.WriteLine("");
 					writer.WriteLine("	public class " +_pokedexEntry.Pokemon +" : PokemonNPC");
 					writer.WriteLine("	{");

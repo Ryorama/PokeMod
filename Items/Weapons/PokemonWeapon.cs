@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using PokeModBlue;
-using PokeModBlue.NPCs;
+using PokeModBlue.NPCs.Pokemon;
 
 namespace PokeModBlue.Items.Weapons
 {
@@ -424,13 +424,87 @@ namespace PokeModBlue.Items.Weapons
             netMessage.Send();*/
         }
 
+        /**
+ * Gets and caches the result of the pokemon's first type
+ */
+        int typeI = -2;
+        public int getTypeI() {
+            if (typeI == -2) {
+                PokedexEntry val;
+                if (Pokedex.pokedex.TryGetValue(id, out val)) {
+                    int type;
+                    bool found = false;
+                    found = PokemonNPC.types.TryGetValue(val.Type_I, out type);
+                    if (found) {
+                        typeI = type;
+                    } else {
+                        typeI = -1;
+                    }
+                }
+            }
+            return typeI;
+        }
+
+        /**
+         * Gets and caches the result of the pokemon's second type
+         */
+        int typeII = -2;
+        public int getTypeII() {
+            if (typeII == -2) {
+                PokedexEntry val;
+                if (Pokedex.pokedex.TryGetValue(id, out val)) {
+                    int type;
+                    bool found = false;
+                    found = PokemonNPC.types.TryGetValue(val.Type_II, out type);
+                    if (found) {
+                        typeII = type;
+                    } else {
+                        typeII = -1;
+                    }
+                }
+            }
+            return typeI;
+        }
+
+        public string getTypeIName() {
+            PokedexEntry val;
+            if (Pokedex.pokedex.TryGetValue(id, out val)) {
+                return val.Type_I;
+            } else {
+                return "";
+            }
+        }
+
+        public string getTypeIIName() {
+            PokedexEntry val;
+            if (Pokedex.pokedex.TryGetValue(id, out val)) {
+                return val.Type_II;
+            } else {
+                return "";
+            }
+        }
+
+        public string getTypesString() {
+            string type1 = getTypeIName();
+            string type2 = getTypeIIName();
+            if (type1 != "") {
+                if (type2 != "") {
+                    return type1 + "/" + type2;
+                } else {
+                    return type1;
+                }
+            } else {
+                return "???";
+            }
+        }
+
         public void SetToolTip()
 		{
 			if (this.CanRightClick())
 			{
-				item.toolTip = "Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " + System.Environment.NewLine + currentHP + "/" + maxHP + " HP" + originalTrainer +System.Environment.NewLine +"Right Click to Evolve!";
+				item.toolTip = getTypesString() +System.Environment.NewLine +"Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " + System.Environment.NewLine + currentHP + "/" + maxHP + " HP" + originalTrainer +System.Environment.NewLine +"Right Click to Evolve!";
 			} else {
-				item.toolTip = "Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " +originalTrainer +System.Environment.NewLine +currentHP +"/" +maxHP +" HP";
+				item.toolTip = getTypesString() + System.Environment.NewLine + "Level: " +level.ToString() +System.Environment.NewLine +"Experience: " +experience.ToString() +"/" +GetExpForLevel(level+1).ToString() +System.Environment.NewLine +"Nature: " +GetNatureString() +System.Environment.NewLine +StatLine() +System.Environment.NewLine +"Original Trainer: " +originalTrainer +System.Environment.NewLine +currentHP +"/" +maxHP +" HP";
             }
 			
 		}

@@ -17,6 +17,7 @@ namespace PokeModBlue.NPCs
 
         public override void SetDefaults()
         {
+            npc.CloneDefaults(NPCID.Nurse);
             npc.name = "PokeNurse";
             npc.townNPC = true;
             npc.friendly = true;

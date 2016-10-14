@@ -7,7 +7,7 @@ using PokeModBlue.Projectiles.Minions;
 using PokeModBlue.Projectiles.Minions.PokemonProjectiles;
 using PokeModBlue.Items.Weapons;
 
-namespace PokeModBlue.NPCs
+namespace PokeModBlue.NPCs.Pokemon
 {
     public class PokeGlobalNPC : GlobalNPC
     {

@@ -1,5 +1,7 @@
-v0.6.2 Changelog:
-For tModLoder v0.8.3.4
-PokeNurse added and functional, she is always available to spawn, so build her a home and keep her safe.
-PokeNurse is currently the only way to revive fainted Pokemon.
-Pokemon can now faint and will not be possible to summon until healed.
+v0.6.6 Changelog:
+For tModLoder v0.8.3.5
+Types and type effectiveness is now in. This should encourage more diverse teams. Currently a Pokemon
+only attacks using their first type, and has the weaknesses and resistances of any types they have.
+Types, and damage formulae are as per the main series games, with one difference, attacks that don't
+affect a Pokemon still deal 1 damage.
+Pokemon in the player's inventory are now also healed if the player dies.

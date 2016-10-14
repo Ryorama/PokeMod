@@ -144,5 +144,19 @@ namespace PokeModBlue
         {
             return item.type >= ItemID.Count;
         }
+
+        public override void Kill(double damage, int hitDirection, bool pvp, string deathText) {
+            for (int i = 0; i < player.inventory.Length; i++) {
+                PokemonWeapon pokemonWeapon = player.inventory[i].modItem as PokemonWeapon;
+                if (pokemonWeapon != null) {
+                    pokemonWeapon.currentHP = pokemonWeapon.maxHP;
+                    pokemonWeapon.SetToolTip();
+                    if (pokemonWeapon.npc != null) {
+                        pokemonWeapon.npc.life = pokemonWeapon.maxHP;
+                        pokemonWeapon.npc.HealEffect(pokemonWeapon.maxHP);
+                    }
+                }
+            }
+        }
     }
 }
