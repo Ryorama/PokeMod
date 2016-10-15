@@ -10,7 +10,7 @@ namespace PokeModBlue.Items.Weapons.Pokeballs
 	{		
 		public override void SetDefaults()
 		{
-			item.name = "Poke Ball";
+			item.name = "Poké Ball";
 			item.damage = 1;
 			item.thrown = true;
 			item.width = 18;

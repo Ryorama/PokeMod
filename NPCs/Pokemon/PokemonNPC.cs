@@ -195,7 +195,7 @@ namespace PokeModBlue.NPCs.Pokemon {
         /**
          * gets the multiplier for damage based on the attacking move type, and the types of the defending pokemon
          */
-        public float getTypeEffectiveness(int atkType, int defTypeI, int defTypeII) {
+        public static float getTypeEffectiveness(int atkType, int defTypeI, int defTypeII) {
             if (defTypeI != -1) {
                 if (defTypeII != -1) {
                     return typeEffectiveness[atkType, defTypeI] * typeEffectiveness[atkType, defTypeII]; 
@@ -428,22 +428,31 @@ namespace PokeModBlue.NPCs.Pokemon {
             if (target.modNPC != null) {
                 PokemonNPC pokemonTarget = target.modNPC as PokemonNPC;
                 if (pokemonTarget != null) {
+
+                    int direction;
+                    if (target.position.X > npc.position.X) {
+                        direction = 1;
+                    } else {
+                        direction = -1;
+                    }
+
                     float effectiveness = getTypeEffectiveness(getTypeI(), pokemonTarget.getTypeI(), pokemonTarget.getTypeII());
                     damage = (int)(damage * effectiveness);
+
                     if (effectiveness < 1 && effectiveness > 0) {
-                        combatTextNum = CombatText.NewText(new Rectangle((int)target.position.X, (int)target.position.Y, npc.width, npc.height), PokemonText, "It's not very effective...", false, false);
+                        combatTextNum = CombatText.NewText(new Rectangle((int)target.position.X + 150 * direction, (int)target.position.Y, npc.width, npc.height), PokemonText, "It's not very effective...", false, false);
                         if (Main.netMode == 2 && combatTextNum != 100) {
                             CombatText combatText = Main.combatText[combatTextNum];
                             NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
                         }
                     } else if (effectiveness > 1) {
-                        combatTextNum = CombatText.NewText(new Rectangle((int)target.position.X, (int)target.position.Y, npc.width, npc.height), PokemonText, "It's super effective!", false, false);
+                        combatTextNum = CombatText.NewText(new Rectangle((int)target.position.X + 150 * direction, (int)target.position.Y, npc.width, npc.height), PokemonText, "It's super effective!", false, false);
                         if (Main.netMode == 2 && combatTextNum != 100) {
                             CombatText combatText = Main.combatText[combatTextNum];
                             NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
                         }
                     } else if (effectiveness == 0) {
-                        combatTextNum = CombatText.NewText(new Rectangle((int)target.position.X, (int)target.position.Y, npc.width, npc.height), PokemonText, "It doesn't affect " + target.name + "...", false, false);
+                        combatTextNum = CombatText.NewText(new Rectangle((int)target.position.X + 150 * direction, (int)target.position.Y, npc.width, npc.height), PokemonText, "It doesn't affect " + target.name + "...", false, false);
                         if (Main.netMode == 2 && combatTextNum != 100) {
                             CombatText combatText = Main.combatText[combatTextNum];
                             NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);

@@ -6,13 +6,15 @@ using Terraria.ModLoader;
 using PokeModBlue.Projectiles.Minions;
 using PokeModBlue.Projectiles.Minions.PokemonProjectiles;
 using PokeModBlue.Items.Weapons;
+using Microsoft.Xna.Framework;
 
 namespace PokeModBlue.NPCs.Pokemon
 {
     public class PokeGlobalNPC : GlobalNPC
     {
 		PokemonWeapon lastHit;
-		
+        int combatTextNum;
+
         public override void OnHitByProjectile(NPC npc, Projectile projectile, int damage, float knockback, bool crit)
 		{
 			//check if hit by a pokemon projectile and save it
@@ -46,22 +48,53 @@ namespace PokeModBlue.NPCs.Pokemon
 		
 		public override void ModifyHitNPC(NPC npc, NPC target, ref int damage, ref float knockback, ref bool crit)
 		{
-			// target is actually your Pokemon
-			// npc is the npc that is hitting your Pokemon
-			// this says let your Pokemon hit first, and if they kill the enemy take no damage
-			// will need to update this to check each Pokemon's speed stat when both are Pokemon and letting the winner strike first
-			if (target.modNPC != null)
+            // target is actually your Pokemon
+            // npc is the npc that is hitting your Pokemon
+            // this says let your Pokemon hit first, and if they kill the enemy take no damage
+            // will need to update this to check each Pokemon's speed stat when both are Pokemon and letting the winner strike first
+            if (target.modNPC != null)
 			{
-				PokemonNPC pokemonNPC;
-				pokemonNPC = target.modNPC as PokemonNPC;
-				if (pokemonNPC != null)
-				{
-                    npc.StrikeNPC(target.damage, 1.0f, target.direction);
-                    if (npc.life <= 0)
-					{
-						damage = 0; // at most will reduce the damage to 1, since it will not ever deal 0 damage
-					}
-				}
+				PokemonNPC targetPokemon;
+                targetPokemon = target.modNPC as PokemonNPC;
+                if (targetPokemon != null) {
+                    PokemonNPC npcPokemon;
+                    npcPokemon = npc.modNPC as PokemonNPC;
+                    if (npcPokemon != null) {
+
+                        int direction;
+                        if (npc.position.X > target.position.X) {
+                            direction = 1;
+                        } else {
+                            direction = -1;
+                        }
+
+                        float effectiveness = PokemonNPC.getTypeEffectiveness(targetPokemon.getTypeI(), npcPokemon.getTypeI(), npcPokemon.getTypeII());
+                        int npcdamage = (int)(target.damage * effectiveness);
+
+                        if (effectiveness < 1 && effectiveness > 0) {
+                            combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X + 150 * direction, (int)npc.position.Y, npc.width, npc.height), PokemonNPC.PokemonText, "It's not very effective...", false, false);
+                            if (Main.netMode == 2 && combatTextNum != 100) {
+                                CombatText combatText = Main.combatText[combatTextNum];
+                                NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                            }
+                        } else if (effectiveness > 1) {
+                            combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X + 150 * direction, (int)npc.position.Y, npc.width, npc.height), PokemonNPC.PokemonText, "It's super effective!", false, false);
+                            if (Main.netMode == 2 && combatTextNum != 100) {
+                                CombatText combatText = Main.combatText[combatTextNum];
+                                NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                            }
+                        } else if (effectiveness == 0) {
+                            combatTextNum = CombatText.NewText(new Rectangle((int)npc.position.X + 150 * direction, (int)npc.position.Y, npc.width, npc.height), PokemonNPC.PokemonText, "It doesn't affect " + npc.name + "...", false, false);
+                            if (Main.netMode == 2 && combatTextNum != 100) {
+                                CombatText combatText = Main.combatText[combatTextNum];
+                                NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
+                            }
+                        }
+                        npc.StrikeNPC(npcdamage, 1.0f, target.direction);
+                    } else {
+                        npc.StrikeNPC(target.damage, 1.0f, target.direction);
+                    }
+                }
 			}
 		}
 		
@@ -95,16 +128,26 @@ namespace PokeModBlue.NPCs.Pokemon
             {
                 shop.item[nextSlot].SetDefaults(mod.ItemType("PokeBall"));
                 nextSlot++;
-				if (NPC.downedBoss2)
+                shop.item[nextSlot].SetDefaults(mod.ItemType("Potion"));
+                nextSlot++;
+                if (NPC.downedBoss1) {
+                    shop.item[nextSlot].SetDefaults(mod.ItemType("SuperPotion"));
+                    nextSlot++;
+                }
+                if (NPC.downedBoss2)
 				{
 					shop.item[nextSlot].SetDefaults(mod.ItemType("GreatBall"));
 					nextSlot++;
-				}
+                    shop.item[nextSlot].SetDefaults(mod.ItemType("HyperPotion"));
+                    nextSlot++;
+                }
 				if (Main.hardMode)
 				{
 					shop.item[nextSlot].SetDefaults(mod.ItemType("UltraBall"));
 					nextSlot++;
-				}
+                    shop.item[nextSlot].SetDefaults(mod.ItemType("MaxPotion"));
+                    nextSlot++;
+                }
             }
 			
 			if(type == NPCID.Clothier)

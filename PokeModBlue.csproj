@@ -108,6 +108,10 @@
     <Compile Include="Items\Armor\RedCap.cs" />
     <Compile Include="Items\Pokecase.cs" />
     <Compile Include="Items\PokeGlobalItem.cs" />
+    <Compile Include="Items\Usable\HyperPotion.cs" />
+    <Compile Include="Items\Usable\MaxPotion.cs" />
+    <Compile Include="Items\Usable\Potion.cs" />
+    <Compile Include="Items\Usable\SuperPotion.cs" />
     <Compile Include="Items\Weapons\ArbokPokeball.cs" />
     <Compile Include="Items\Weapons\BeedrillPokeball.cs" />
     <Compile Include="Items\Weapons\BlastoisePokeball.cs" />
@@ -311,6 +315,10 @@
     <Content Include="Items\Armor\RedCap.png" />
     <Content Include="Items\Armor\RedCap_Head.png" />
     <Content Include="Items\Pokecase.png" />
+    <Content Include="Items\Usable\HyperPotion.png" />
+    <Content Include="Items\Usable\MaxPotion.png" />
+    <Content Include="Items\Usable\Potion.png" />
+    <Content Include="Items\Usable\SuperPotion.png" />
     <Content Include="Items\Weapons\ArbokPokeball.png" />
     <Content Include="Items\Weapons\BeedrillPokeball.png" />
     <Content Include="Items\Weapons\BlastoisePokeball.png" />
