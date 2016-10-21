@@ -7,6 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using PokeModBlue;
 using PokeModBlue.NPCs.Pokemon;
+using PokeModBlue.Projectiles;
 
 namespace PokeModBlue.Items.Weapons
 {
@@ -14,6 +15,8 @@ namespace PokeModBlue.Items.Weapons
 	public abstract class PokemonWeapon : ModItem
 	{
         public NPC npc;
+        public PokeballSummon pokeball = null;
+        public bool summoned = false;
         int combatTextNum;
         public static Color PokemonText = new Color(255, 255, 255, 255);
 
@@ -261,6 +264,7 @@ namespace PokeModBlue.Items.Weapons
             if (ModLoader.GetMod("PokeModBlueSounds")!=null) {
                 item.useSound = ModLoader.GetMod("PokeModBlueSounds").GetSoundSlot(SoundType.Item, "Sounds/Item/id" + ((int)id).ToString());
             }
+            currentHP = maxHP;
             SetToolTip();
         }
 
@@ -274,6 +278,9 @@ namespace PokeModBlue.Items.Weapons
         // removed for debugging why pokemon aren't spawning as of 1.3.3.2
         public override bool CanUseItem(Player player)
         {
+            if (summoned) {
+                return false;
+            }
             if (player.selectedItem == 58)
             {
                 combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, "Use Pokemon from the hotbar to summon.", false, false);
@@ -304,23 +311,44 @@ namespace PokeModBlue.Items.Weapons
 
         public override bool UseItem(Player player)
 		{
-            PokePlayer modPlayer = (PokePlayer)player.GetModPlayer(mod, "PokePlayer");
-			// need to put a limiter on this, max 1 per item
-			if (player.HasBuff(mod.BuffType(Name + "Buff")) < 0 && player.itemTime == 0 && player.itemAnimation > 0 && player.controlUseItem)
-			{
-                /*if (Main.netMode != 1)
-                {
-                    NPC.ReleaseNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC, item.placeStyle, player.whoAmI);
-                }*/
-                int npc = NPC.NewNPC((int)player.position.X, (int)player.position.Y, (int)item.makeNPC);
-                Main.npc[npc].releaseOwner = (byte)player.whoAmI;
-                Main.npc[npc].life = currentHP;
-
+            if (pokeball == null) {
+                int proj = Projectile.NewProjectile(player.position, new Vector2(3.0f * (float)player.direction, -2.0f), mod.ProjectileType("PokeballSummon"), 0, 0.0f);
+                pokeball = Main.projectile[proj].modProjectile as PokeballSummon;
+                if (pokeball != null) {
+                    pokeball.pokemon = this;
+                    pokeball.player = player;
+                }
             }
             return true;
 		}
-		
-		public override void GetWeaponDamage(Player player, ref int damage)
+
+        public void SummonPokemon(Player player, Vector2 position) {
+            if (Main.netMode == 0) {
+                int npc = NPC.NewNPC((int)position.X, (int)position.Y, (int)item.makeNPC);
+                Main.npc[npc].releaseOwner = (byte)player.whoAmI;
+                Main.npc[npc].life = currentHP;
+            } else if (Main.netMode == 1) {
+                ModPacket packet = mod.GetPacket();
+                packet.Write((byte)PokeModMessageType.SummonPokemon);
+                packet.Write((int)position.X);
+                packet.Write((int)position.Y);
+                packet.Write((int)item.makeNPC);
+                packet.Write((byte)player.whoAmI);
+                packet.Write((int)currentHP);
+                packet.Send();
+            }
+            summoned = true;
+            /*
+            PokePlayer modPlayer = (PokePlayer)player.GetModPlayer(mod, "PokePlayer");
+            // need to put a limiter on this, max 1 per item
+            if (player.HasBuff(mod.BuffType(Name + "Buff")) < 0 && player.itemTime == 0 && player.itemAnimation > 0 && player.controlUseItem)
+            {
+                 
+            }
+            */
+        }
+
+        public override void GetWeaponDamage(Player player, ref int damage)
 		{
 			damage = Atk;
 		}
@@ -669,6 +697,7 @@ namespace PokeModBlue.Items.Weapons
 			newItem.SpDEV = this.SpDEV;
 			newItem.SpeIV = this.SpeIV;
 			newItem.SpeEV = this.SpeEV;
+            newItem.currentHP = this.currentHP;
 			if (Main.player[item.owner].HasBuff(mod.BuffType(Name+ "Buff")) > -1)
 			{
 				Main.player[item.owner].DelBuff(Main.player[item.owner].HasBuff(mod.BuffType(Name+ "Buff")));
@@ -693,7 +722,6 @@ namespace PokeModBlue.Items.Weapons
 			float t = (originalTrainer == Main.player[Main.myPlayer].name) ? 1f : 1.5f;
 			float v = (level < EvolveLevel) ? 1f : 1.2f;
 			experience += (int)((((a * b * L)/(5f * s))*(((float)Math.Pow(((2f*L)+10), 2.5f))/((float)Math.Pow((L+Lp+10), 2.5f)))) * t * e * p);
-			
 			CheckLevelUp();
 			SetToolTip();
 		}
@@ -773,18 +801,19 @@ namespace PokeModBlue.Items.Weapons
 		{
 			if (level < 100)
 			{
-				while (experience >= GetExpForLevel(level+1))
-				{
-					experience -= GetExpForLevel(level+1);
-                    combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, item.name + " grew to level " + (level+1).ToString() + "!", false, false);
-                    if (Main.netMode == 2 && combatTextNum != 100)
-                    {
+                while (experience >= GetExpForLevel(level + 1)) {
+                    experience -= GetExpForLevel(level + 1);
+                    combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[item.owner].position.X, (int)Main.player[item.owner].position.Y, Main.player[item.owner].width, Main.player[item.owner].height), PokemonText, item.name + " grew to level " + (level + 1).ToString() + "!", false, false);
+                    if (Main.netMode == 2 && combatTextNum != 100) {
                         CombatText combatText = Main.combatText[combatTextNum];
                         NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
                     }
                     Main.PlaySound(SoundLoader.customSoundType, -1, -1, mod.GetSoundSlot(SoundType.Custom, "Sounds/Custom/ExpFull"));
                     level += 1;
-				}
+                    if (level == 100) {
+                        break;
+                    }
+                }
 			}
 		}
 	}

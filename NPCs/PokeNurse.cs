@@ -109,6 +109,7 @@ namespace PokeModBlue.NPCs
 			randExtraCooldown = 30;
 		}
 
+        /*
 		public override void TownNPCAttackProj(ref int projType, ref int attackDelay)
 		{
 			projType = mod.ProjectileType("SparklingBall");
@@ -120,5 +121,6 @@ namespace PokeModBlue.NPCs
 			multiplier = 12f;
 			randomOffset = 2f;
 		}
+        */
 	}
 }

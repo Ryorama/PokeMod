@@ -13,8 +13,8 @@ namespace PokeModBlue
 	public class PokeWorld : ModWorld
 	{
 		public PokemonWeapon pokemon;
-		
-		/*
+
+        /*
 		// used to debug what information the server knows, essentially nothing, only the item owner actually saves and loads the stats of the item
 		// so there is no central authoritative server for item information, so I cannot ask the server to tell everyone the stats of the pokemon, and only the server is allowed to send info
 		public override void PostUpdate()
@@ -32,5 +32,5 @@ namespace PokeModBlue
 			}
 		}
 		*/
-	}
+    }
 }

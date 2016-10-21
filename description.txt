@@ -1,7 +1,6 @@
-v0.6.6 Changelog:
+Pokemod brings the popular Pokemon franchise to Terraria.
+It adds Pokemon as NPC's to battle and capture, and then summon to use as allies. Will add many items, mounts, bosses, Town NPC's and more.
+
+v0.6.8.1 Changelog:
 For tModLoder v0.8.3.5
-Types and type effectiveness is now in. This should encourage more diverse teams. Currently a Pokemon
-only attacks using their first type, and has the weaknesses and resistances of any types they have.
-Types, and damage formulae are as per the main series games, with one difference, attacks that don't
-affect a Pokemon still deal 1 damage.
-Pokemon in the player's inventory are now also healed if the player dies.
+Fixed a bug where evolving a Pokemon reset their current HP to 0.

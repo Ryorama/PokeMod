@@ -82,10 +82,15 @@ namespace PokeModBlue
                     }
                     else if (pokeSpawns == 3)
                     {
+                        pokeSpawns = 4;
+                        Main.NewText("Only Pokemon Spawn");
+                    } else if (pokeSpawns == 4) {
                         pokeSpawns = 1;
                         Main.NewText("All NPCs Spawn");
                     }
                 }
+            } else if (name == "test") {
+                Main.NewText("Test");
             }
         }
 
@@ -115,9 +120,12 @@ namespace PokeModBlue
             {
                 // This message sent by the player when they load to initialize the custom Pokemon Weapon Data for all players
                 case PokeModMessageType.SetPokemonWeaponData:
-                    //int tremorTime = reader.ReadInt32();
-                    //ExampleWorld world = (ExampleWorld)GetModWorld("ExampleWorld");
-                    //world.VolcanoTremorTime = tremorTime;
+                    
+                    break;
+                case PokeModMessageType.SummonPokemon:
+                    int npc = NPC.NewNPC(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+                    Main.npc[npc].releaseOwner = reader.ReadByte();
+                    Main.npc[npc].life = reader.ReadInt32();
                     break;
                 default:
                     ErrorLogger.Log("PokeMod: Unknown Message type: " + msgType);
@@ -129,5 +137,6 @@ namespace PokeModBlue
     enum PokeModMessageType : byte
     {
         SetPokemonWeaponData,
+        SummonPokemon,
     }
 }

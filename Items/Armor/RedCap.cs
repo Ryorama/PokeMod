@@ -22,7 +22,7 @@ namespace PokeModBlue.Items.Armor
 			item.toolTip = "'For those who want to be the very best.'";
 			item.value = 10000;
 			item.rare = 1;
-			item.vanity = true;
+            item.vanity = true;
 		}
 
 		public override bool DrawHead()

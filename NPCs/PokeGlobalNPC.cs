@@ -160,23 +160,46 @@ namespace PokeModBlue.NPCs.Pokemon
         public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
         {
             PokeModBlue.originalSpawnPool = pool;
-            
             List<int> keys = new List<int>(pool.Keys);
             foreach (int key in keys)
             {
-                ModNPC modNPC = NPCLoader.GetNPC(key);
-                if (modNPC == null) // if the ModNPC returned is empty it is a vanilla NPC
-                {
-                    if (PokeModBlue.pokeSpawns == 2)
-                    {
-                        //edit the value of pool at [key]
+                // All NPCs Spawn
+                if (PokeModBlue.pokeSpawns == 1) {
+                    pool[key] = PokeModBlue.originalSpawnPool[key];
+                    continue;
+                }
+
+                // Only Mod NPCs Spawn
+                if (PokeModBlue.pokeSpawns == 2) {
+                    ModNPC modNPC = NPCLoader.GetNPC(key);
+                    if (modNPC != null) {
+                        pool[key] = PokeModBlue.originalSpawnPool[key];
+                    } else {
                         pool[key] = 0f;
                     }
-                    else if (PokeModBlue.pokeSpawns == 3 || PokeModBlue.pokeSpawns == 1)
-                    {
-                        //edit the value of pool at [key]
+                    continue;
+                }
+
+                // Only Normal NPCs Spawn
+                if (PokeModBlue.pokeSpawns == 3) {
+                    ModNPC modNPC = NPCLoader.GetNPC(key);
+                    if (modNPC != null) {
+                        pool[key] = 0f;
+                    } else {
                         pool[key] = PokeModBlue.originalSpawnPool[key];
                     }
+                    continue;
+                }
+
+                // Only Pokemon Spawn
+                if (PokeModBlue.pokeSpawns == 4) {
+                    PokemonNPC pokemonNPC = NPCLoader.GetNPC(key) as PokemonNPC;
+                    if (pokemonNPC != null) {
+                        pool[key] = PokeModBlue.originalSpawnPool[key];
+                    } else {
+                        pool[key] = 0f;
+                    }
+                    continue;
                 }
             }
         }

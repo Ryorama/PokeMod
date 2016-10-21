@@ -105,7 +105,9 @@
     <Compile Include="Buffs\WigglytuffBuff.cs" />
     <Compile Include="Buffs\ZubatBuff.cs" />
     <Compile Include="IPokedexEntry.cs" />
+    <Compile Include="Items\Accessories\TrainerCard.cs" />
     <Compile Include="Items\Armor\RedCap.cs" />
+    <Compile Include="Items\Mounts\CarKey.cs" />
     <Compile Include="Items\Pokecase.cs" />
     <Compile Include="Items\PokeGlobalItem.cs" />
     <Compile Include="Items\Usable\HyperPotion.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Items\Weapons\DugtrioPokeball.cs" />
     <Compile Include="Items\Weapons\EkansPokeball.cs" />
     <Compile Include="Items\Weapons\FearowPokeball.cs" />
+    <Compile Include="Items\Weapons\GeodudePokeball.cs" />
     <Compile Include="Items\Weapons\GloomPokeball.cs" />
     <Compile Include="Items\Weapons\GolbatPokeball.cs" />
     <Compile Include="Items\Weapons\GyaradosPokeball.cs" />
@@ -143,6 +146,7 @@
     <Compile Include="Items\Weapons\NidorinoPokeball.cs" />
     <Compile Include="Items\Weapons\NinetalesPokeball.cs" />
     <Compile Include="Items\Weapons\OddishPokeball.cs" />
+    <Compile Include="Items\Weapons\OnixPokeball.cs" />
     <Compile Include="Items\Weapons\ParasectPokeball.cs" />
     <Compile Include="Items\Weapons\ParasPokeball.cs" />
     <Compile Include="Items\Weapons\PidgeotPokeball.cs" />
@@ -170,6 +174,9 @@
     <Compile Include="Items\Weapons\WeedlePokeball.cs" />
     <Compile Include="Items\Weapons\WigglytuffPokeball.cs" />
     <Compile Include="Items\Weapons\ZubatPokeball.cs" />
+    <Compile Include="Mounts\Car.cs" />
+    <Compile Include="NPCs\Onix.cs" />
+    <Compile Include="NPCs\Pokemon\Geodude.cs" />
     <Compile Include="NPCs\Pokemon\Lapras.cs" />
     <Compile Include="NPCs\Pokemon\Munchlax.cs" />
     <Compile Include="NPCs\Pokemon\Arbok.cs" />
@@ -232,6 +239,8 @@
     <Compile Include="NPCs\Pokemon\ShinyLapras.cs" />
     <Compile Include="NPCs\Pokemon\Snorlax.cs" />
     <Compile Include="NPCs\Pokemon\XynomDratini.cs" />
+    <Compile Include="NPCs\Trainers\Brock.cs" />
+    <Compile Include="NPCs\Trainers\Trainer.cs" />
     <Compile Include="Pokedex.cs" />
     <Compile Include="PokedexEntry.cs" />
     <Compile Include="PokedexEntryConverter.cs" />
@@ -250,6 +259,7 @@
     <Compile Include="Projectiles\Minions\PokemonProjectiles\WaterGun.cs" />
     <Compile Include="Projectiles\PokeBall.cs" />
     <Compile Include="Projectiles\PokeballProjectile.cs" />
+    <Compile Include="Projectiles\PokeballSummon.cs" />
     <Compile Include="Projectiles\UltraBall.cs" />
     <Compile Include="Sounds\Custom\ExpFull.cs" />
     <Compile Include="Sounds\NPCHit\NormalDamage.cs" />
@@ -312,8 +322,10 @@
     <Content Include="build.txt" />
     <Content Include="changelog.txt" />
     <Content Include="description.txt" />
+    <Content Include="Items\Accessories\TrainerCard.png" />
     <Content Include="Items\Armor\RedCap.png" />
     <Content Include="Items\Armor\RedCap_Head.png" />
+    <Content Include="Items\Mounts\CarKey.png" />
     <Content Include="Items\Pokecase.png" />
     <Content Include="Items\Usable\HyperPotion.png" />
     <Content Include="Items\Usable\MaxPotion.png" />
@@ -334,6 +346,7 @@
     <Content Include="Items\Weapons\DugtrioPokeball.png" />
     <Content Include="Items\Weapons\EkansPokeball.png" />
     <Content Include="Items\Weapons\FearowPokeball.png" />
+    <Content Include="Items\Weapons\GeodudePokeball.png" />
     <Content Include="Items\Weapons\GloomPokeball.png" />
     <Content Include="Items\Weapons\GolbatPokeball.png" />
     <Content Include="Items\Weapons\GyaradosPokeball.png" />
@@ -350,6 +363,7 @@
     <Content Include="Items\Weapons\NidorinoPokeball.png" />
     <Content Include="Items\Weapons\NinetalesPokeball.png" />
     <Content Include="Items\Weapons\OddishPokeball.png" />
+    <Content Include="Items\Weapons\OnixPokeball.png" />
     <Content Include="Items\Weapons\ParasectPokeball.png" />
     <Content Include="Items\Weapons\ParasPokeball.png" />
     <Content Include="Items\Weapons\PidgeotPokeball.png" />
@@ -377,6 +391,10 @@
     <Content Include="Items\Weapons\WeedlePokeball.png" />
     <Content Include="Items\Weapons\WigglytuffPokeball.png" />
     <Content Include="Items\Weapons\ZubatPokeball.png" />
+    <Content Include="Mounts\Car_Back.png" />
+    <Content Include="Mounts\Car_Front.png" />
+    <Content Include="NPCs\Onix.png" />
+    <Content Include="NPCs\Pokemon\Geodude.png" />
     <Content Include="NPCs\Pokemon\Lapras.png" />
     <Content Include="NPCs\Pokemon\Munchlax.png" />
     <Content Include="NPCs\Pokemon\Arbok.png" />
@@ -439,6 +457,9 @@
     <Content Include="NPCs\Pokemon\ShinyLapras.png" />
     <Content Include="NPCs\Pokemon\Snorlax.png" />
     <Content Include="NPCs\Pokemon\XynomDratini.png" />
+    <Content Include="NPCs\Trainers\Brock.png" />
+    <Content Include="NPCs\Trainers\Brock_Alt_1.png" />
+    <Content Include="NPCs\Trainers\Brock_Head.png" />
     <Content Include="Projectiles\GreatBall.png" />
     <Content Include="Projectiles\MasterBall.png" />
     <Content Include="Projectiles\Minions\PokemonProjectiles\Ember.png" />
@@ -448,6 +469,7 @@
     <Content Include="Projectiles\Minions\PokemonProjectiles\VineWhip.png" />
     <Content Include="Projectiles\Minions\PokemonProjectiles\WaterGun.png" />
     <Content Include="Projectiles\PokeBall.png" />
+    <Content Include="Projectiles\PokeballSummon.png" />
     <Content Include="Projectiles\UltraBall.png" />
     <Content Include="Sounds\Custom\ExpFull.wav" />
     <Content Include="Sounds\NPCHit\NormalDamage.wav" />
@@ -462,7 +484,6 @@
   <ItemGroup>
     <Folder Include=".git\" />
     <Folder Include=".vs\" />
-    <Folder Include="NPCs\Trainers\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

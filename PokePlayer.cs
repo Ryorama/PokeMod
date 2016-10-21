@@ -14,8 +14,33 @@ namespace PokeModBlue
 {
     public class PokePlayer : ModPlayer
     {
+        public bool loaded = false;
+        public Boolean trainerCard = false;
+        Color black = Microsoft.Xna.Framework.Color.Black;
+        /*
+        public override void PostUpdate() {
+            if (trainerCard) {
+                Vector2 position = Main.fontMouseText.MeasureString("This Text");
+                float num83 = 0f;
+                if (Main.player[player.whoAmI].chatOverhead.timeLeft > 0) {
+                    num83 = -position.Y;
+                }
+                Vector2 vector4 = new Vector2((float)(Main.screenWidth / 2) + Main.screenPosition.X, (float)(Main.screenHeight / 2) + Main.screenPosition.Y);
+                float num86 = Main.player[player.whoAmI].position.X + (float)(Main.player[player.whoAmI].width / 2) - vector4.X;
+                float num87 = Main.player[player.whoAmI].position.Y - position.Y - 2f + num83 - vector4.Y;
+                Main.spriteBatch.DrawString(Main.fontMouseText, "This Text", vector4, black, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
+            }
+            base.PostUpdateEquips();
+        }
+        */
+
         public override void PreUpdate()
         {
+            if (!loaded) {
+                Main.NewText("PokeModBlue loaded. Thanks for playing, let me know of any suggestions or issues on the forums :)" + System.Environment.NewLine +"-UnownDeveloper");
+                loaded = true;
+            }
+
             // closes the conversation window if trying to select a pokemon and talking to the goblin to prevent reforging pokemon
             if (player.talkNPC > -1)
             {

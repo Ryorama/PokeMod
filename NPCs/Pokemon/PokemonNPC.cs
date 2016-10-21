@@ -8,6 +8,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using PokeModBlue.Items.Weapons;
 using PokeModBlue.Projectiles.Minions.PokemonProjectiles;
+using PokeModBlue.NPCs.Trainers;
 
 namespace PokeModBlue.NPCs.Pokemon {
     public abstract class PokemonNPC : ModNPC {
@@ -474,6 +475,15 @@ namespace PokeModBlue.NPCs.Pokemon {
 		}
 		*/
 
+        public override bool? CanHitNPC(NPC target) {
+            Trainer trainer = target.modNPC as Trainer;
+            if (trainer != null) {
+                return false;
+            } else {
+                return base.CanHitNPC(target);
+            }
+        }
+
         public override void AI() {
             if (!set && npc.releaseOwner != 255) {
                 //Main.NewText("Go " + npc.name + "!");
@@ -773,6 +783,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                     NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
                 }
                 Main.player[npc.releaseOwner].DelBuff(Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name + "Buff")));
+                pokemon.summoned = false;
             }
             if (pokemon != null) {
                 pokemon.currentHP = npc.life;
@@ -786,6 +797,7 @@ namespace PokeModBlue.NPCs.Pokemon {
             if (set && npc.active && npc.releaseOwner != 255 && Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name + "Buff")) < 0) {
                 //Main.NewText(npc.name +", ok! Come back!");
                 combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[npc.releaseOwner].position.X, (int)Main.player[npc.releaseOwner].position.Y, npc.width, npc.height), PokemonText, npc.name + ", ok! Come back!", false, false);
+                pokemon.summoned = false;
                 if (Main.netMode == 2 && combatTextNum != 100) {
                     CombatText combatText = Main.combatText[combatTextNum];
                     NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
