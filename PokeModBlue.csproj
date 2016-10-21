@@ -173,8 +173,8 @@
     <Compile Include="Items\Weapons\WartortlePokeball.cs" />
     <Compile Include="Items\Weapons\WeedlePokeball.cs" />
     <Compile Include="Items\Weapons\WigglytuffPokeball.cs" />
+    <Compile Include="Items\Weapons\XynomDratiniPokeball.cs" />
     <Compile Include="Items\Weapons\ZubatPokeball.cs" />
-    <Compile Include="Mounts\Car.cs" />
     <Compile Include="NPCs\Onix.cs" />
     <Compile Include="NPCs\Pokemon\Geodude.cs" />
     <Compile Include="NPCs\Pokemon\Lapras.cs" />
@@ -390,9 +390,8 @@
     <Content Include="Items\Weapons\WartortlePokeball.png" />
     <Content Include="Items\Weapons\WeedlePokeball.png" />
     <Content Include="Items\Weapons\WigglytuffPokeball.png" />
+    <Content Include="Items\Weapons\XynomDratiniPokeball.png" />
     <Content Include="Items\Weapons\ZubatPokeball.png" />
-    <Content Include="Mounts\Car_Back.png" />
-    <Content Include="Mounts\Car_Front.png" />
     <Content Include="NPCs\Onix.png" />
     <Content Include="NPCs\Pokemon\Geodude.png" />
     <Content Include="NPCs\Pokemon\Lapras.png" />
