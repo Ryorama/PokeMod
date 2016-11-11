@@ -1,25 +1,24 @@
-using System;
-using System.IO;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 using PokeModBlue.Items.Weapons;
-using PokeModBlue.Projectiles.Minions.PokemonProjectiles;
 using PokeModBlue.NPCs.Trainers;
+using System;
+using System.Collections.Generic;
+using Terraria;
+using Terraria.ModLoader;
 
 namespace PokeModBlue.NPCs.Pokemon {
+
     public abstract class PokemonNPC : ModNPC {
 
         //properties that need to be synchronized
         // once and then on demand
         public byte capture = 0; //current capture status, 0 if not currently undergoing attempted capture
+
         public float ballRate = 0; // rate of ball attempting capture currently, 0 if not undergoing attempted captured
 
         // once
         public byte nature;
+
         public byte HPIV;
         public byte AtkIV;
         public byte DefIV;
@@ -29,6 +28,7 @@ namespace PokeModBlue.NPCs.Pokemon {
 
         // once and then on level up
         public byte level = 1;
+
         public byte HPEV;
         public byte AtkEV;
         public byte DefEV;
@@ -38,13 +38,15 @@ namespace PokeModBlue.NPCs.Pokemon {
 
         // internals
         public PokemonWeapon pokemon; //does this need to be synced?
+
         private bool set = true;
         public float movSpeed;
-        int combatTextNum;
+        private int combatTextNum;
         //private bool netUpdate = true;
 
         //internals that are the same for all Pokemon of certain species or can be derived from synchronized properties
         public static Color PokemonText = new Color(255, 255, 255, 255);
+
         public virtual float id { get; protected set; }
         public virtual float idleAccel { get { return 0.978f; } }
         public virtual float spacingMult { get { return 1f; } }
@@ -63,6 +65,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 return ((((2 * baseHP) + HPIV + (HPEV / 4)) * level) / 100) + level + 10;
             }
         }
+
         public int Atk {
             get {
                 return (int)((float)(((((2 * baseAtk) + AtkIV + (AtkEV / 4)) * level) / 100) + level + 5) * NatureMultipler("Atk"));
@@ -95,6 +98,7 @@ namespace PokeModBlue.NPCs.Pokemon {
 
         // constants
         public const byte Hardy = 1;
+
         public const byte Lonely = 2;
         public const byte Brave = 3;
         public const byte Adamant = 4;
@@ -173,7 +177,7 @@ namespace PokeModBlue.NPCs.Pokemon {
             { "Fairy", FAIRY }
         };
 
-                                                                              // NORMA FIGHT FLYIN POISO GROUN ROCK  BUG   GHOST STEEL FIRE  WATER GRASS ELECT PSYCH ICE   DRAGO DARK  FAIRY
+        // NORMA FIGHT FLYIN POISO GROUN ROCK  BUG   GHOST STEEL FIRE  WATER GRASS ELECT PSYCH ICE   DRAGO DARK  FAIRY
         public static readonly float[,] typeEffectiveness = new float[18, 18] { {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }, //NORMAL
                                                                                 {2.0f, 1.0f, 0.5f, 0.5f, 1.0f, 2.0f, 0.5f, 0.0f, 2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 2.0f, 1.0f, 2.0f, 0.5f }, //FIGHT
                                                                                 {1.0f, 2.0f, 1.0f, 1.0f, 1.0f, 0.5f, 2.0f, 1.0f, 0.5f, 1.0f, 1.0f, 2.0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }, //FLYING
@@ -191,27 +195,34 @@ namespace PokeModBlue.NPCs.Pokemon {
                                                                                 {1.0f, 1.0f, 2.0f, 1.0f, 2.0f, 1.0f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 2.0f, 1.0f, 1.0f, 0.5f, 2.0f, 1.0f, 1.0f }, //ICE
                                                                                 {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 2.0f, 1.0f, 0.0f }, //DRAGON
                                                                                 {1.0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 2.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 2.0f, 1.0f, 1.0f, 0.5f, 0.5f }, //DARK
-                                                                                {1.0f, 2.0f, 1.0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 1.0f }  //FAIRY 
+                                                                                {1.0f, 2.0f, 1.0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 2.0f, 2.0f, 1.0f }  //FAIRY
                                                                                 };
+
         /**
          * gets the multiplier for damage based on the attacking move type, and the types of the defending pokemon
          */
+
         public static float getTypeEffectiveness(int atkType, int defTypeI, int defTypeII) {
             if (defTypeI != -1) {
                 if (defTypeII != -1) {
-                    return typeEffectiveness[atkType, defTypeI] * typeEffectiveness[atkType, defTypeII]; 
+                    return typeEffectiveness[atkType, defTypeI] * typeEffectiveness[atkType, defTypeII];
                 } else {
                     return typeEffectiveness[atkType, defTypeI];
                 }
             } else {
-                return 1.0f;
+                if (defTypeII != -1) {
+                    return typeEffectiveness[atkType, defTypeI];
+                } else {
+                    return 1.0f;
+                }
             }
         }
 
         /**
          * Gets and caches the result of the pokemon's first type
          */
-        int typeI = -2;
+        private int typeI = -2;
+
         public int getTypeI() {
             if (typeI == -2) {
                 PokedexEntry val;
@@ -232,7 +243,8 @@ namespace PokeModBlue.NPCs.Pokemon {
         /**
          * Gets and caches the result of the pokemon's second type
          */
-        int typeII = -2;
+        private int typeII = -2;
+
         public int getTypeII() {
             if (typeII == -2) {
                 PokedexEntry val;
@@ -247,7 +259,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                     }
                 }
             }
-            return typeI;
+            return typeII;
         }
 
         public int catchRate {
@@ -271,6 +283,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public int baseAtk {
             get {
                 PokedexEntry val;
@@ -281,6 +294,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public int baseDef {
             get {
                 PokedexEntry val;
@@ -291,6 +305,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public int baseSpA {
             get {
                 PokedexEntry val;
@@ -301,6 +316,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public int baseSpD {
             get {
                 PokedexEntry val;
@@ -311,6 +327,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public int baseSpe {
             get {
                 PokedexEntry val;
@@ -321,6 +338,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public int EXP {
             get {
                 PokedexEntry val;
@@ -331,6 +349,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public int EXPV {
             get {
                 PokedexEntry val;
@@ -341,6 +360,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
         }
+
         public List<KeyValuePair<int, string>> EV_Worth {
             get {
                 PokedexEntry val;
@@ -360,6 +380,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 return list;
             }
         }
+
         public string Name {
             get {
                 PokedexEntry val;
@@ -411,9 +432,6 @@ namespace PokeModBlue.NPCs.Pokemon {
             npc.knockBackResist = 1.0f;
             Main.npcCatchable[mod.NPCType(npc.name)] = true;
             npc.soundHit = mod.GetSoundSlot(SoundType.NPCHit, "Sounds/NPCHit/NormalDamage");
-            if (ModLoader.GetMod("PokeModBlueSounds") != null) {
-                npc.soundKilled = ModLoader.GetMod("PokeModBlueSounds").GetSoundSlot(SoundType.NPCKilled, "Sounds/NPCKilled/id" + ((int)id).ToString());
-            }
             set = false;
         }
 
@@ -429,7 +447,6 @@ namespace PokeModBlue.NPCs.Pokemon {
             if (target.modNPC != null) {
                 PokemonNPC pokemonTarget = target.modNPC as PokemonNPC;
                 if (pokemonTarget != null) {
-
                     int direction;
                     if (target.position.X > npc.position.X) {
                         direction = 1;
@@ -463,18 +480,6 @@ namespace PokeModBlue.NPCs.Pokemon {
             }
         }
 
-        /*
-		public override void SendExtraAI(BinaryWriter writer)
-		{
-
-		}
-
-		public override void ReceiveExtraAI(BinaryReader reader)
-		{
-
-		}
-		*/
-
         public override bool? CanHitNPC(NPC target) {
             Trainer trainer = target.modNPC as Trainer;
             if (trainer != null) {
@@ -491,8 +496,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                 if (Main.netMode == 2 && combatTextNum != 100) {
                     CombatText combatText = Main.combatText[combatTextNum];
                     NetMessage.SendData(81, -1, -1, combatText.text, (int)combatText.color.PackedValue, combatText.position.X, combatText.position.Y, 0f, 0, 0, 0);
-                }
-                pokemon = Main.player[npc.releaseOwner].inventory[Main.player[npc.releaseOwner].selectedItem].modItem as PokemonWeapon;
+                };
                 pokemon.npc = this.npc;
                 pokemon.npc.life = pokemon.currentHP;
                 level = pokemon.level;
@@ -583,7 +587,6 @@ namespace PokeModBlue.NPCs.Pokemon {
                 }
             }
 
-
             //attack target
             if (targetPos != npc.position) // if there is a target
             {
@@ -610,7 +613,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                         }
                     }
 
-                    // jump at targets you can't reach 
+                    // jump at targets you can't reach
                     if (targetPos.Y < npc.position.Y && grounded) {
                         npc.velocity.Y -= movSpeed;
                     }
@@ -630,7 +633,7 @@ namespace PokeModBlue.NPCs.Pokemon {
                     else
                         move towards target
                     endif
-                endif      
+                endif
                 */
             } else {
                 //idle movement, this is only when there is no valid target to attack
@@ -648,7 +651,6 @@ namespace PokeModBlue.NPCs.Pokemon {
                         if (npc.position.Y - npc.height > targPos.Y - npc.height) {
                             npc.velocity.Y -= 0.31f;
                         }
-                        
                     } else // not flying or a water pokemon currently in water
                     {
                         // if below the player and not currently falling or jumping, jump!
@@ -775,6 +777,9 @@ namespace PokeModBlue.NPCs.Pokemon {
         }
 
         public override bool CheckDead() {
+            if (ModLoader.GetMod("PokeModBlueSounds") != null) {
+                Main.PlaySound(SoundLoader.customSoundType, -1, -1, ModLoader.GetMod("PokeModBlueSounds").GetSoundSlot(SoundType.Custom, "Sounds/Custom/id" + ((int)id).ToString()));
+            }
             if (set && npc.releaseOwner != 255 && Main.player[npc.releaseOwner].HasBuff(mod.BuffType(Name + "Buff")) > -1) {
                 //Main.NewText(npc.name +" has fainted!");
                 combatTextNum = CombatText.NewText(new Rectangle((int)Main.player[npc.releaseOwner].position.X, (int)Main.player[npc.releaseOwner].position.Y, npc.width, npc.height), PokemonText, npc.name + " has fainted!", false, false);
@@ -810,7 +815,6 @@ namespace PokeModBlue.NPCs.Pokemon {
                 npc.life = 0;
                 npc.active = false;
                 npc.netUpdate = true;
-
             }
             if (npc.friendly) {
                 return false; //doesn't count against max npc limit near players (as they are player summoned and shouldn't reduce total enemy npcs)
@@ -826,7 +830,6 @@ namespace PokeModBlue.NPCs.Pokemon {
                 npc.frameCounter = 0;
                 npc.frame.Y = 0;
             }
-
         }
 
         public virtual void CreateDust() {
@@ -928,54 +931,79 @@ namespace PokeModBlue.NPCs.Pokemon {
             switch (nature) {
                 case 1:
                     return "Hardy";
+
                 case 2:
                     return "Lonely";
+
                 case 3:
                     return "Brave";
+
                 case 4:
                     return "Adamant";
+
                 case 5:
                     return "Naughty";
+
                 case 6:
                     return "Bold";
+
                 case 7:
                     return "Docile";
+
                 case 8:
                     return "Relaxed";
+
                 case 9:
                     return "Impish";
+
                 case 10:
                     return "Lax";
+
                 case 11:
                     return "Timid";
+
                 case 12:
                     return "Hasty";
+
                 case 13:
                     return "Serious";
+
                 case 14:
                     return "Jolly";
+
                 case 15:
                     return "Naive";
+
                 case 16:
                     return "Modest";
+
                 case 17:
                     return "Mild";
+
                 case 18:
                     return "Quiet";
+
                 case 19:
                     return "Bashful";
+
                 case 20:
                     return "Rash";
+
                 case 21:
                     return "Calm";
+
                 case 22:
                     return "Gentle";
+
                 case 23:
                     return "Sassy";
+
                 case 24:
                     return "Careful";
+
                 case 25:
                     return "Quirky";
+
                 default:
                     return "Hardy";
             }

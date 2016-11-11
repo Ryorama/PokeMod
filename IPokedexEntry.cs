@@ -1,7 +1,5 @@
-namespace PokeModBlue
-{
-	public interface IPokedexEntry
-	{
+namespace PokeModBlue {
 
-	}
+    public interface IPokedexEntry {
+    }
 }

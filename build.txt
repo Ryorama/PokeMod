@@ -5,4 +5,4 @@ homepage = http://forums.terraria.org/index.php?threads/pokemod.40542/
 hideCode = true
 hideResources = true
 includeSource = false
-buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, .git\*, .gitattributes, .gitignore, packages\*, properties\*
+buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, .git\*, .gitattributes, .gitignore, packages\*, properties\*, Unimplemented.zip

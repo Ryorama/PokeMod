@@ -1,22 +1,15 @@
-using System;
-using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace PokeModBlue.Items.Weapons {
 
-	public class SquirtlePokeball : PokemonWeapon
-	{
-		public override float id {get{return 7f;}}
-		
-		public override void SetDefaults()
-		{
-            base.SetDefaults();
-		}
+    public class SquirtlePokeball : PokemonWeapon {
+        public override float id { get { return 7f; } }
 
-        public override void AddRecipes()
-        {
+        public override void SetDefaults() {
+            base.SetDefaults();
+        }
+
+        public override void AddRecipes() {
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(null, "Pokecase", 1);
             recipe.SetResult(mod.ItemType(Name + "Pokeball"));

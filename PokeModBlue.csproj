@@ -7,11 +7,13 @@
     <ProjectGuid>{A6C2193B-79FB-4A10-ADA3-D572DB20CD51}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PokeModBlue1</RootNamespace>
-    <AssemblyName>PokeModBlue1</AssemblyName>
+    <RootNamespace>PokeModBlue</RootNamespace>
+    <AssemblyName>PokeModBlue</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <DocumentationFile>C:\docs.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\PokeModBlue.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -107,7 +111,6 @@
     <Compile Include="IPokedexEntry.cs" />
     <Compile Include="Items\Accessories\TrainerCard.cs" />
     <Compile Include="Items\Armor\RedCap.cs" />
-    <Compile Include="Items\Mounts\CarKey.cs" />
     <Compile Include="Items\Pokecase.cs" />
     <Compile Include="Items\PokeGlobalItem.cs" />
     <Compile Include="Items\Usable\HyperPotion.cs" />
@@ -163,6 +166,7 @@
     <Compile Include="Items\Weapons\RattataPokeball.cs" />
     <Compile Include="Items\Weapons\SandshrewPokeball.cs" />
     <Compile Include="Items\Weapons\SandslashPokeball.cs" />
+    <Compile Include="Items\Weapons\ShinyLaprasPokeball.cs" />
     <Compile Include="Items\Weapons\SpearowPokeball.cs" />
     <Compile Include="Items\Weapons\SquirtlePokeball.cs" />
     <Compile Include="Items\Weapons\VenomothPokeball.cs" />
@@ -175,8 +179,8 @@
     <Compile Include="Items\Weapons\WigglytuffPokeball.cs" />
     <Compile Include="Items\Weapons\XynomDratiniPokeball.cs" />
     <Compile Include="Items\Weapons\ZubatPokeball.cs" />
-    <Compile Include="NPCs\Onix.cs" />
     <Compile Include="NPCs\Pokemon\Geodude.cs" />
+    <Compile Include="NPCs\Pokemon\Graveler.cs" />
     <Compile Include="NPCs\Pokemon\Lapras.cs" />
     <Compile Include="NPCs\Pokemon\Munchlax.cs" />
     <Compile Include="NPCs\Pokemon\Arbok.cs" />
@@ -211,6 +215,7 @@
     <Compile Include="NPCs\Pokemon\Nidorino.cs" />
     <Compile Include="NPCs\Pokemon\Ninetales.cs" />
     <Compile Include="NPCs\Pokemon\Oddish.cs" />
+    <Compile Include="NPCs\Pokemon\Onix.cs" />
     <Compile Include="NPCs\Pokemon\Paras.cs" />
     <Compile Include="NPCs\Pokemon\Parasect.cs" />
     <Compile Include="NPCs\Pokemon\Pidgeot.cs" />
@@ -320,12 +325,15 @@
     <Content Include="Buffs\WigglytuffBuff.png" />
     <Content Include="Buffs\ZubatBuff.png" />
     <Content Include="build.txt" />
-    <Content Include="changelog.txt" />
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
     <Content Include="description.txt" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Items\Accessories\TrainerCard.png" />
     <Content Include="Items\Armor\RedCap.png" />
     <Content Include="Items\Armor\RedCap_Head.png" />
-    <Content Include="Items\Mounts\CarKey.png" />
     <Content Include="Items\Pokecase.png" />
     <Content Include="Items\Usable\HyperPotion.png" />
     <Content Include="Items\Usable\MaxPotion.png" />
@@ -380,6 +388,7 @@
     <Content Include="Items\Weapons\RattataPokeball.png" />
     <Content Include="Items\Weapons\SandshrewPokeball.png" />
     <Content Include="Items\Weapons\SandslashPokeball.png" />
+    <Content Include="Items\Weapons\ShinyLaprasPokeball.png" />
     <Content Include="Items\Weapons\SpearowPokeball.png" />
     <Content Include="Items\Weapons\SquirtlePokeball.png" />
     <Content Include="Items\Weapons\VenomothPokeball.png" />
@@ -392,8 +401,8 @@
     <Content Include="Items\Weapons\WigglytuffPokeball.png" />
     <Content Include="Items\Weapons\XynomDratiniPokeball.png" />
     <Content Include="Items\Weapons\ZubatPokeball.png" />
-    <Content Include="NPCs\Onix.png" />
     <Content Include="NPCs\Pokemon\Geodude.png" />
+    <Content Include="NPCs\Pokemon\Graveler.png" />
     <Content Include="NPCs\Pokemon\Lapras.png" />
     <Content Include="NPCs\Pokemon\Munchlax.png" />
     <Content Include="NPCs\Pokemon\Arbok.png" />
@@ -428,6 +437,7 @@
     <Content Include="NPCs\Pokemon\Nidorino.png" />
     <Content Include="NPCs\Pokemon\Ninetales.png" />
     <Content Include="NPCs\Pokemon\Oddish.png" />
+    <Content Include="NPCs\Pokemon\Onix.png" />
     <Content Include="NPCs\Pokemon\Paras.png" />
     <Content Include="NPCs\Pokemon\Parasect.png" />
     <Content Include="NPCs\Pokemon\Pidgeot.png" />
@@ -470,6 +480,11 @@
     <Content Include="Projectiles\PokeBall.png" />
     <Content Include="Projectiles\PokeballSummon.png" />
     <Content Include="Projectiles\UltraBall.png" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\jquery-1.9.0.intellisense.js" />
+    <Content Include="Scripts\jquery-1.9.0.js" />
+    <Content Include="Scripts\jquery-1.9.0.min.js" />
     <Content Include="Sounds\Custom\ExpFull.wav" />
     <Content Include="Sounds\NPCHit\NormalDamage.wav" />
   </ItemGroup>
@@ -477,8 +492,15 @@
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
     <None Include="app.config" />
+    <None Include="Content\bootstrap-theme.css.map" />
+    <None Include="Content\bootstrap.css.map" />
+    <None Include="fonts\glyphicons-halflings-regular.eot" />
+    <None Include="fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="LICENSE" />
     <None Include="packages.config" />
+    <None Include="Scripts\jquery-1.9.0.min.map" />
+    <None Include="Unimplemented.zip" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".git\" />

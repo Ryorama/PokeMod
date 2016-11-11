@@ -1,29 +1,16 @@
 using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Converters;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using Terraria.Social;
-using Terraria.Utilities;
 
-namespace PokeModBlue
-{
-	public static class Pokedex
-	{
-		public static Dictionary<float, PokedexEntry> pokedex = new Dictionary<float, PokedexEntry>();
+namespace PokeModBlue {
 
-		static Pokedex()
-		{
-			List<PokedexEntry> _pokedex = JsonConvert.DeserializeObject<List<PokedexEntry>>(PokedexJSON._pokedexJSON, new PokedexEntryConverter());
-			foreach (PokedexEntry _pokedexEntry in _pokedex)
-			{
-				pokedex.Add(_pokedexEntry.Nat, _pokedexEntry);
-				/*
+    public static class Pokedex {
+        public static Dictionary<float, PokedexEntry> pokedex = new Dictionary<float, PokedexEntry>();
+
+        static Pokedex() {
+            List<PokedexEntry> _pokedex = JsonConvert.DeserializeObject<List<PokedexEntry>>(PokedexJSON._pokedexJSON, new PokedexEntryConverter());
+            foreach (PokedexEntry _pokedexEntry in _pokedex) {
+                pokedex.Add(_pokedexEntry.Nat, _pokedexEntry);
+                /*
 				using (StreamWriter writer = new StreamWriter("\\Weapons\\" +_pokedexEntry.Pokemon +"Pokeball.cs"))
 				{
 					writer.WriteLine("using System;");
@@ -126,12 +113,10 @@ namespace PokeModBlue
 					writer.WriteLine("}");
 				}
 				*/
-			}
-		}
-		
-		public static void DoNothing()
-		{
-			
-		}
-	}
+            }
+        }
+
+        public static void DoNothing() {
+        }
+    }
 }

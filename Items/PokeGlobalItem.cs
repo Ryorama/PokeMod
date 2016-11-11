@@ -1,26 +1,22 @@
-﻿using Terraria;
-using Terraria.UI;
-using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PokeModBlue.Items.Weapons;
+using Terraria;
+using Terraria.ModLoader;
+using Terraria.UI;
 
-namespace PokeModBlue.Items
-{
-    public class PokeGlobalItem : GlobalItem
-    {
+namespace PokeModBlue.Items {
+
+    public class PokeGlobalItem : GlobalItem {
         private double time;
         private static Item[] singleSlotArray;
 
-        public PokeGlobalItem()
-        {
+        public PokeGlobalItem() {
             singleSlotArray = new Item[1];
         }
 
-        public override void PostDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
-        {
-            if (time != Main.time)
-            {
+        public override void PostDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale) {
+            if (time != Main.time) {
                 time = Main.time;
 
                 // These 2 lines might not be needed, not sure why there are here.
@@ -33,28 +29,22 @@ namespace PokeModBlue.Items
             base.PostDrawInInventory(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale);
         }
 
-        private void DrawUpdateExtraAccessories(SpriteBatch spriteBatch)
-        {
-            if (Main.playerInventory && Main.EquipPage == 2)
-            {
+        private void DrawUpdateExtraAccessories(SpriteBatch spriteBatch) {
+            if (Main.playerInventory && Main.EquipPage == 2) {
                 Point value = new Point(Main.mouseX, Main.mouseY);
                 Rectangle r = new Rectangle(0, 0, (int)((float)Main.inventoryBackTexture.Width * Main.inventoryScale), (int)((float)Main.inventoryBackTexture.Height * Main.inventoryScale));
 
                 PokePlayer pp = Main.player[Main.myPlayer].GetModPlayer<PokePlayer>(mod);
-                for (int i = 0; i < 6; i++)
-                {
+                for (int i = 0; i < 6; i++) {
                     Main.inventoryScale = 0.85f;
                     Item accItem = pp.ExtraAccessories[i];
 
                     int mH = 0;
-                    if (Main.mapEnabled)
-                    {
-                        if (!Main.mapFullscreen && Main.mapStyle == 1)
-                        {
+                    if (Main.mapEnabled) {
+                        if (!Main.mapFullscreen && Main.mapStyle == 1) {
                             mH = 256;
                         }
-                        if (mH + 600 > Main.screenHeight)
-                        {
+                        if (mH + 600 > Main.screenHeight) {
                             mH = Main.screenHeight - 600;
                         }
                     }
@@ -65,9 +55,7 @@ namespace PokeModBlue.Items
                     r.X = num17;
                     r.Y = num18 + (0 + i) * 47;
 
-
-                    if (r.Contains(value))
-                    {
+                    if (r.Contains(value)) {
                         Main.player[Main.myPlayer].mouseInterface = true;
                         Main.armorHide = true;
                         singleSlotArray[0] = accItem;
@@ -84,23 +72,18 @@ namespace PokeModBlue.Items
         }
 
         // Saves Pokemon Weapon custom data
-        public override bool NeedsCustomSaving(Item item)
-        {
-            if (item.modItem != null)
-            {
+        public override bool NeedsCustomSaving(Item item) {
+            if (item.modItem != null) {
                 PokemonWeapon pokemonWeapon;
                 pokemonWeapon = item.modItem as PokemonWeapon;
-                if (pokemonWeapon != null)
-                {
+                if (pokemonWeapon != null) {
                     return true;
-                } else
-                {
+                } else {
                     return false;
                 }
-            } else
-            {
+            } else {
                 return false;
             }
         }
-    }    
+    }
 }

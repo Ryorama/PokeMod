@@ -1,8 +1,8 @@
-namespace PokeModBlue
-{
-	public static class PokedexJSON
-	{
-		public const string _pokedexJSON = @"[
+namespace PokeModBlue {
+
+    public static class PokedexJSON {
+
+        public const string _pokedexJSON = @"[
 		  {
 			'Per':1,
 			'Nat':1,
@@ -23009,6 +23009,5 @@ namespace PokeModBlue
 			'Un':155
 		  }
 		]";
-	}
+    }
 }
-
